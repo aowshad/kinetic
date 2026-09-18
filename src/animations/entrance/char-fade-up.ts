@@ -3,8 +3,8 @@ import type { AnimationModule } from '../../lib/types'
 
 const run: AnimationModule['run'] = (el, o) => {
   el.setAttribute('aria-label', el.textContent ?? '')
-  const split = new SplitText(el, { type: 'chars' })
-  split.chars.forEach((c) => c.setAttribute('aria-hidden', 'true'))
+  const split = new SplitText(el, { type: 'words,chars', wordsClass: 'k-word', charsClass: 'k-char' })
+  split.words.forEach((w) => w.setAttribute('aria-hidden', 'true'))
 
   const tl = gsap.timeline({ delay: o.delay })
   tl.from(split.chars, {
@@ -13,10 +13,12 @@ const run: AnimationModule['run'] = (el, o) => {
     duration: o.duration,
     stagger: o.stagger,
     ease: o.ease,
+    onStart: () => gsap.set(split.chars, { willChange: 'transform, opacity' }),
+    onComplete: () => gsap.set(split.chars, { willChange: 'auto' }),
   })
 
   return () => {
-    tl.kill()
+    tl.progress(1).kill()
     split.revert()
   }
 }

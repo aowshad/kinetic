@@ -3,6 +3,7 @@ import { RotateCcw } from 'lucide-react'
 import Stage from './Stage'
 import CodeBlock from './CodeBlock'
 import { useAnimation } from '../lib/useAnimation'
+import { useInView } from '../lib/useInView'
 import type { CatalogEntry } from '../lib/types'
 
 export default function AnimationCard({
@@ -14,32 +15,48 @@ export default function AnimationCard({
 }) {
   const { module, source } = entry
   const [replayKey, setReplayKey] = useState(0)
+  const [showCode, setShowCode] = useState(false)
+  const { ref: cardRef, inView } = useInView<HTMLElement>('100% 0px')
   const stageKey = `${sampleText}::${replayKey}`
-  const ref = useAnimation<HTMLElement>(module, module.defaults, [stageKey])
+  const ref = useAnimation<HTMLElement>(module, module.defaults, inView, [stageKey])
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 transition-colors hover:border-white/20">
-      <div className="mb-4 flex items-center justify-between">
+    <article ref={cardRef} className="k-card">
+      <header className="k-card-header">
         <div>
-          <h3 className="text-sm font-medium">{module.name}</h3>
-          <p className="text-xs text-[var(--muted)] capitalize">{module.category}</p>
+          <h3 className="k-card-title">{module.name}</h3>
+          <p className="k-chip">{module.category}</p>
         </div>
-        <button
-          type="button"
-          aria-label={`Replay ${module.name}`}
-          onClick={() => setReplayKey((k) => k + 1)}
-          className="rounded-full border border-[var(--border)] p-2 text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
-        >
-          <RotateCcw size={16} />
-        </button>
-      </div>
-      <div className="flex min-h-[120px] items-center justify-center overflow-hidden py-6">
+        <div className="k-card-actions">
+          <button
+            type="button"
+            aria-label={`Replay ${module.name}`}
+            onClick={() => setReplayKey((k) => k + 1)}
+            className="k-icon-btn"
+          >
+            <RotateCcw size={16} />
+          </button>
+          <button
+            type="button"
+            aria-expanded={showCode}
+            onClick={() => setShowCode((v) => !v)}
+            className="k-ghost-btn"
+          >
+            {showCode ? 'Hide code' : 'Show code'}
+          </button>
+        </div>
+      </header>
+      <div className="stage">
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
       </div>
-      <p className="mt-4 text-xs text-[var(--muted)]">{module.blurb}</p>
-      <div className="mt-4">
-        <CodeBlock code={source} />
+      <footer className="k-card-footer">
+        <p className="k-blurb">{module.blurb}</p>
+      </footer>
+      <div className={showCode ? 'code-drawer open' : 'code-drawer'}>
+        <div>
+          <CodeBlock code={source} />
+        </div>
       </div>
-    </div>
+    </article>
   )
 }

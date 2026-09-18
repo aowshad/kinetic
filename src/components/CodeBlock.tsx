@@ -11,16 +11,15 @@ export default function CodeBlock({ code }: { code: string }) {
   }
 
   return (
-    <div className="relative rounded-lg border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg)_60%,transparent)]">
-      <button
-        type="button"
-        onClick={copy}
-        className="absolute right-2 top-2 flex items-center gap-1 rounded-md border border-[var(--border)] px-2 py-1 text-xs text-[var(--muted)] hover:text-[var(--text)]"
-      >
-        {copied ? <Check size={14} /> : <Copy size={14} />}
-        <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
-      </button>
-      <pre className="max-h-72 overflow-auto p-4 pr-20 text-xs leading-relaxed font-mono">
+    <div className="code-drawer-scroll">
+      <div className="code-drawer-bar">
+        <span>ts</span>
+        <button type="button" onClick={copy} className="code-copy-btn">
+          {copied ? <Check size={13} /> : <Copy size={13} />}
+          <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
+        </button>
+      </div>
+      <pre className="code-pre">
         <code>{code}</code>
       </pre>
     </div>
