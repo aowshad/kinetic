@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Pause, Play } from 'lucide-react'
+import { Check, Link2, Play, Repeat } from 'lucide-react'
 import catalog from '../animations/registry'
 import Stage from '../components/Stage'
-import ControlPanel from '../components/ControlPanel'
+import ControlPanel, { type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
 import { useAnimation } from '../lib/useAnimation'
-import { ROLE_DEFAULTS } from '../lib/roleDefaults'
-import { reactSnippet, setupSnippet, withLiveDefaults } from '../lib/snippets'
+import { useSampleText } from '../lib/useSampleText'
+import { emitReact, emitVanilla } from '../lib/emit'
 import type { AnimationOptions, TextRole } from '../lib/types'
 
 const FIT_RANGES: Record<TextRole, { min: number; max: number }> = {
@@ -37,116 +37,137 @@ export default function Detail() {
     )
   }
 
-  return <DetailView key={entry.module.id} entry={entry} prevId={prev?.module.id} nextId={next?.module.id} />
+  return <DetailView key={entry.module.id} entry={entry} prev={prev} next={next} />
 }
 
 function DetailView({
   entry,
-  prevId,
-  nextId,
+  prev,
+  next,
 }: {
   entry: (typeof catalog)[number]
-  prevId?: string
-  nextId?: string
+  prev?: (typeof catalog)[number]
+  next?: (typeof catalog)[number]
 }) {
-  const { module, source } = entry
-  const defaultText = ROLE_DEFAULTS[module.roles[0]]
-  const [inputValue, setInputValue] = useState(defaultText)
-  const [sampleText, setSampleText] = useState(defaultText)
+  const { module, source, css } = entry
+  const [sampleText, setSampleText] = useSampleText()
+  const [align, setAlign] = useState<Align>('center')
   const [options, setOptions] = useState<AnimationOptions>(module.defaults)
+  const [previewEase, setPreviewEase] = useState<string | null>(null)
   const [replayKey, setReplayKey] = useState(0)
-  const isLoop = module.category === 'loop'
+  const [autoLoop, setAutoLoop] = useState(false)
   const isHover = module.category === 'hover'
-  const [isPlaying, setIsPlaying] = useState(isLoop)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
 
   useEffect(() => {
-    const id = setTimeout(() => setSampleText(inputValue), 300)
-    return () => clearTimeout(id)
-  }, [inputValue])
+    if (!autoLoop) return
+    const id = setInterval(() => setReplayKey((k) => k + 1), 1200)
+    return () => clearInterval(id)
+  }, [autoLoop])
 
-  const active = isLoop ? isPlaying : true
-  const stageKey = `${sampleText}::${JSON.stringify(options)}::${replayKey}`
+  const effectiveOptions: AnimationOptions = { ...options, ease: previewEase ?? options.ease }
+  const stageKey = `${sampleText}::${JSON.stringify(effectiveOptions)}::${replayKey}`
   const ref = useAnimation<HTMLElement>(
     module,
-    options,
-    active,
+    effectiveOptions,
+    true,
     stageKey,
     FIT_RANGES[module.roles[0]],
-    isLoop ? undefined : setIsPlaying,
+    setIsPlaying,
   )
 
-  const vanilla = withLiveDefaults(source, options)
-  const react = reactSnippet(module, sampleText)
-  const setup = setupSnippet(module.plugins)
+  const vanilla = emitVanilla(module, source, options, css)
+  const react = emitReact(module, source, options, sampleText, css)
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(`${location.origin}${location.pathname}#/a/${module.id}`)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
+  }
 
   return (
     <div className="min-h-screen px-6 py-16">
       <div className="mx-auto max-w-[1100px]">
-        <Link to="/" className="detail-back">
-          ← Back to gallery
-        </Link>
-        <header className="detail-header">
-          <div>
-            <h1 className="detail-title">{module.name}</h1>
-            <p className="k-chip">{module.category}</p>
-          </div>
-          {isHover ? (
-            <span className="k-hint">Hover the text</span>
-          ) : isLoop ? (
-            <button
-              type="button"
-              aria-pressed={isPlaying}
-              aria-label={`${isPlaying ? 'Pause' : 'Play'} ${module.name} animation`}
-              onClick={() => setIsPlaying((v) => !v)}
-              className="k-play-btn"
-            >
-              {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={isPlaying}
-              aria-label={`Play ${module.name} animation`}
-              onClick={() => setReplayKey((k) => k + 1)}
-              className="k-play-btn"
-            >
-              <Play size={14} />
-              {isPlaying ? 'Playing…' : 'Play animation'}
-            </button>
-          )}
-        </header>
+        <div className="detail-topbar">
+          <Link to="/" className="detail-back">
+            ← Back to gallery
+          </Link>
+          <button type="button" onClick={copyLink} className="k-ghost-btn">
+            {linkCopied ? <Check size={13} /> : <Link2 size={13} />}
+            {linkCopied ? 'Copied' : 'Copy link'}
+          </button>
+        </div>
 
-        <div className="stage detail-stage">
+        <div className="detail-title-row">
+          <div className="detail-title-group">
+            <h1 className="detail-title">{module.name}</h1>
+            <span className="k-chip">{module.category}</span>
+            {module.plugins.map((p) => (
+              <span key={p} className="plugin-badge" title="Included free in GSAP 3.13+">
+                {p}
+              </span>
+            ))}
+          </div>
+          <div className="detail-actions">
+            {isHover ? (
+              <span className="k-hint">Hover the text</span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={isPlaying}
+                  aria-label={`Play ${module.name} animation`}
+                  onClick={() => setReplayKey((k) => k + 1)}
+                  className="k-play-btn"
+                >
+                  <Play size={14} />
+                  {isPlaying ? 'Playing…' : 'Play'}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={autoLoop}
+                  aria-label="Loop playback every 1.2s"
+                  title="Loop playback every 1.2s"
+                  onClick={() => setAutoLoop((v) => !v)}
+                  className="k-play-btn"
+                >
+                  <Repeat size={14} />
+                  Loop
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+        <p className="detail-blurb">{module.blurb}</p>
+
+        <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
           <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
         </div>
 
-        <p className="detail-blurb">{module.blurb}</p>
+        <ControlPanel
+          sampleText={sampleText}
+          onSampleTextChange={setSampleText}
+          align={align}
+          onAlignChange={setAlign}
+          options={options}
+          defaults={module.defaults}
+          onChange={setOptions}
+          onReset={() => setOptions(module.defaults)}
+          onPreviewEase={setPreviewEase}
+        />
 
-        <div className="detail-grid">
-          <div className="detail-panel">
-            <label className="block text-left text-xs text-[var(--muted)]">
-              Sample text
-              <input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                className="mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]"
-              />
-            </label>
-            <ControlPanel options={options} onChange={setOptions} />
-          </div>
-          <CodeTabs vanilla={vanilla} react={react} setup={setup} />
-        </div>
+        <CodeTabs vanilla={vanilla} react={react} source={source} />
 
         <nav className="detail-nav">
-          {prevId && (
-            <Link to={`/a/${prevId}`} className="k-ghost-btn">
-              ← Prev
+          {prev && (
+            <Link to={`/a/${prev.module.id}`} className="k-ghost-btn">
+              ← {prev.module.name}
             </Link>
           )}
-          {nextId && (
-            <Link to={`/a/${nextId}`} className="k-ghost-btn">
-              Next →
+          {next && (
+            <Link to={`/a/${next.module.id}`} className="k-ghost-btn">
+              {next.module.name} →
             </Link>
           )}
         </nav>

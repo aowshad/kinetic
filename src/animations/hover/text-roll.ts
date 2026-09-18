@@ -2,6 +2,7 @@ import { gsap } from '../../lib/gsap'
 import type { AnimationModule } from '../../lib/types'
 
 const run: AnimationModule['run'] = (el, o) => {
+  // #region body
   const text = el.textContent ?? ''
   el.setAttribute('aria-label', text); el.innerHTML = ''
   const inner = document.createElement('span')
@@ -28,6 +29,7 @@ const run: AnimationModule['run'] = (el, o) => {
     ons.forEach(([e, fn]) => el.removeEventListener(e, fn))
     el.textContent = text
   }
+  // #endregion body
 }
 const textRoll: AnimationModule = {
   id: 'text-roll', name: 'Text Roll', category: 'hover',

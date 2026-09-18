@@ -24,5 +24,6 @@ export interface AnimationModule {
 export interface CatalogEntry {
   module: AnimationModule
   source: string
+  css?: string
   path: string
 }

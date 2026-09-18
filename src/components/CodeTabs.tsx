@@ -1,23 +1,23 @@
 import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 
-type Tab = 'vanilla' | 'react' | 'setup'
+type Tab = 'vanilla' | 'react' | 'source'
 
-const LABELS: Record<Tab, string> = { vanilla: 'Vanilla JS', react: 'React', setup: 'Setup' }
-const TABS: Tab[] = ['vanilla', 'react', 'setup']
+const LABELS: Record<Tab, string> = { vanilla: 'Vanilla JS', react: 'React', source: 'Source' }
+const TABS: Tab[] = ['vanilla', 'react', 'source']
 
 export default function CodeTabs({
   vanilla,
   react,
-  setup,
+  source,
 }: {
   vanilla: string
   react: string
-  setup: string
+  source: string
 }) {
   const [tab, setTab] = useState<Tab>('vanilla')
   const [copied, setCopied] = useState(false)
-  const code = tab === 'vanilla' ? vanilla : tab === 'react' ? react : setup
+  const code = tab === 'vanilla' ? vanilla : tab === 'react' ? react : source
 
   const copy = async () => {
     await navigator.clipboard.writeText(code)
@@ -47,6 +47,7 @@ export default function CodeTabs({
           <span aria-live="polite">{copied ? 'Copied' : 'Copy'}</span>
         </button>
       </div>
+      {tab === 'source' && <p className="source-label">Internal source — for contributors</p>}
       <pre className="code-pre">
         <code>{code}</code>
       </pre>

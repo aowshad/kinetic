@@ -1,0 +1,16 @@
+.k-roll {
+  display: inline-block;
+  block-size: 1lh;
+  overflow: hidden;
+  line-height: 1;
+  vertical-align: bottom;
+}
+
+.k-roll-inner {
+  display: block;
+}
+
+.k-roll-inner > span {
+  display: block;
+  block-size: 1lh;
+}

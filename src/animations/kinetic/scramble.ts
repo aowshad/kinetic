@@ -2,13 +2,15 @@ import { gsap } from '../../lib/gsap'
 import type { AnimationModule } from '../../lib/types'
 
 const run: AnimationModule['run'] = (el, o, onComplete) => {
+  // #region body
   const text = el.textContent ?? ''
   return gsap.timeline({ delay: o.delay }).to(el, {
     duration: o.duration,
     scrambleText: { text, chars: 'upperCase', revealDelay: 0.3, speed: 0.4 },
     ease: o.ease,
-    onComplete,
+    onComplete, // @internal
   })
+  // #endregion body
 }
 
 const scramble: AnimationModule = {

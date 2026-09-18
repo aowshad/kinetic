@@ -5,8 +5,9 @@ import catalog from '../animations/registry'
 import { ScrollTrigger } from '../lib/gsap'
 import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
-import SampleTextHero, { DEFAULT_SAMPLE_TEXT } from '../components/SampleTextHero'
+import SampleTextHero from '../components/SampleTextHero'
 import ThemeControl from '../components/ThemeControl'
+import { useSampleText } from '../lib/useSampleText'
 import type { Category, TextRole } from '../lib/types'
 import type { ThemeMode } from '../lib/useTheme'
 
@@ -21,8 +22,8 @@ export default function Gallery({
   theme: ThemeMode
   onThemeToggle: (m: ThemeMode) => void
 }) {
-  const [inputValue, setInputValue] = useState(DEFAULT_SAMPLE_TEXT)
-  const [sampleText, setSampleText] = useState(DEFAULT_SAMPLE_TEXT)
+  const [sampleText, setSampleText] = useSampleText()
+  const [inputValue, setInputValue] = useState(sampleText)
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])

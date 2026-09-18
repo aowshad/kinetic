@@ -1,7 +1,5 @@
 import { RotateCcw } from 'lucide-react'
-
-const MAX_LENGTH = 120
-export const DEFAULT_SAMPLE_TEXT = 'I Love Bangladesh'
+import { DEFAULT_SAMPLE_TEXT, SAMPLE_TEXT_MAX } from '../lib/useSampleText'
 
 export default function SampleTextHero({
   value,
@@ -17,13 +15,13 @@ export default function SampleTextHero({
       <div className="hero-field">
         <input
           value={value}
-          maxLength={MAX_LENGTH}
+          maxLength={SAMPLE_TEXT_MAX}
           onChange={(e) => onChange(e.target.value)}
           aria-label="Sample text"
           className="hero-input"
         />
         <span className={nearLimit ? 'hero-counter near-limit' : 'hero-counter'}>
-          {value.length}/{MAX_LENGTH}
+          {value.length}/{SAMPLE_TEXT_MAX}
         </span>
         {value !== DEFAULT_SAMPLE_TEXT && (
           <button
