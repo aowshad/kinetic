@@ -28,12 +28,22 @@ export default function Gallery({
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
+  const [condensed, setCondensed] = useState(false)
   const [installCopied, setInstallCopied] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)
     return () => clearTimeout(id)
   }, [inputValue])
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(([entry]) => setCondensed(!entry.isIntersecting))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const searchFiltered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -116,10 +126,6 @@ export default function Gallery({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupsKey])
 
-  const jumpTo = (category: string) => {
-    sectionRefs.current.get(category)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   const copyInstall = async () => {
     await navigator.clipboard.writeText('npm i gsap')
     setInstallCopied(true)
@@ -160,12 +166,16 @@ export default function Gallery({
 
       <SampleTextHero value={inputValue} onChange={setInputValue} />
 
+      <div ref={sentinelRef} />
+
       <FilterBar
+        condensed={condensed}
         search={search}
         onSearchChange={setSearch}
         categories={categoryCounts}
         selectedCategories={selectedCategories}
         onToggleCategory={toggleCategory}
+        activeCategory={activeCategory}
         roles={roleCounts}
         selectedRoles={selectedRoles}
         onToggleRole={toggleRole}
@@ -178,19 +188,6 @@ export default function Gallery({
           Showing {filtered.length} of {catalog.length} animations
         </p>
       )}
-
-      <nav className="jump-nav" aria-label="Jump to category">
-        {groups.map(({ category }) => (
-          <button
-            key={category}
-            type="button"
-            onClick={() => jumpTo(category)}
-            className={activeCategory === category ? 'active' : ''}
-          >
-            {category}
-          </button>
-        ))}
-      </nav>
 
       <main id="main" className="k-gallery">
         {groups.map(({ category, entries }) => (

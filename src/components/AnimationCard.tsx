@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Check, Link2, Pause, Play } from 'lucide-react'
 import Stage from './Stage'
 import CodeBlock from './CodeBlock'
@@ -24,11 +24,12 @@ export default function AnimationCard({
   sampleText: string
 }) {
   const { module, source } = entry
-  const navigate = useNavigate()
   const [replayKey, setReplayKey] = useState(0)
   const [showCode, setShowCode] = useState(false)
   const [openedOnce, setOpenedOnce] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const [showHint, setShowHint] = useState(false)
+  const hintSeenRef = useRef(false)
   const isLoop = module.category === 'loop'
   const [isPlaying, setIsPlaying] = useState(isLoop)
   const { ref: cardRef, inView } = useInView<HTMLElement>('100% 0px')
@@ -56,6 +57,18 @@ export default function AnimationCard({
     setTimeout(() => setLinkCopied(false), 2000)
   }
 
+  const replay = () => {
+    if (isPlaying) return
+    setReplayKey((k) => k + 1)
+  }
+
+  const onStageMouseEnter = () => {
+    if (hintSeenRef.current) return
+    hintSeenRef.current = true
+    setShowHint(true)
+    setTimeout(() => setShowHint(false), 1600)
+  }
+
   return (
     <article ref={cardRef} id={module.id} className="k-card">
       <div className="k-card-meta">
@@ -69,8 +82,8 @@ export default function AnimationCard({
           <button
             type="button"
             onClick={copyLink}
-            aria-label={`Copy link to ${module.name}`}
-            title="Copy link"
+            aria-label="Copy link to this animation"
+            title={linkCopied ? 'Copied' : 'Copy link to this animation'}
             className="k-icon-btn"
           >
             {linkCopied ? <Check size={14} /> : <Link2 size={14} />}
@@ -96,7 +109,7 @@ export default function AnimationCard({
               type="button"
               disabled={isPlaying}
               aria-label={`Play ${module.name} animation`}
-              onClick={() => setReplayKey((k) => k + 1)}
+              onClick={replay}
               className="k-play-btn"
             >
               <Play size={14} />
@@ -106,10 +119,18 @@ export default function AnimationCard({
           <button type="button" aria-expanded={showCode} onClick={toggleCode} className="k-ghost-btn">
             {showCode ? 'Hide code' : 'Show code'}
           </button>
+          <Link to={`/a/${module.id}`} className="k-ghost-btn">
+            Open ↗
+          </Link>
         </div>
       </div>
-      <div className="stage" onClick={() => navigate(`/a/${module.id}`)}>
+      <div
+        className={isHover ? 'stage' : 'stage stage-clickable'}
+        onClick={isHover ? undefined : replay}
+        onMouseEnter={isHover ? undefined : onStageMouseEnter}
+      >
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+        {showHint && <span className="stage-hint">Click to replay</span>}
       </div>
       <div className="drawer" data-open={showCode}>
         <div className="drawer-inner">{openedOnce && <CodeBlock code={source} />}</div>

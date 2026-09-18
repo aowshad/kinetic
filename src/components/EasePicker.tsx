@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { easeCurvePath } from '../lib/easeCurve'
+import { EASE_DIAGONAL, easeCurvePath } from '../lib/easeCurve'
 
 const GROUPS = [
   { label: 'Standard', eases: ['none', 'power1.out', 'power1.inOut', 'power2.out', 'power2.inOut', 'power3.out', 'power3.inOut', 'power4.out'] },
@@ -8,7 +8,22 @@ const GROUPS = [
   { label: 'Overshoot', eases: ['back.out(1.7)', 'elastic.out(1, 0.3)', 'bounce.out'] },
 ]
 const ALL_EASES = GROUPS.flatMap((g) => g.eases)
-const labelFor = (e: string) => (e === 'none' ? 'linear (none)' : e)
+const SHOW_FILTER = ALL_EASES.length > 12
+
+function Curve({ name, selected }: { name: string; selected?: boolean }) {
+  return (
+    <svg viewBox="-0.15 -0.35 1.3 1.7" width="40" height="28" preserveAspectRatio="none" aria-hidden="true">
+      <path d={EASE_DIAGONAL} fill="none" stroke="currentColor" strokeWidth="0.03" opacity="0.12" />
+      <path
+        d={easeCurvePath(name)}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={selected ? 0.07 : 0.06}
+        className={selected ? 'ease-curve-selected' : undefined}
+      />
+    </svg>
+  )
+}
 
 export default function EasePicker({
   value,
@@ -20,8 +35,25 @@ export default function EasePicker({
   onPreview: (v: string | null) => void
 }) {
   const [open, setOpen] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(() => Math.max(0, ALL_EASES.indexOf(value)))
+  const [query, setQuery] = useState('')
+  const [activeEase, setActiveEase] = useState(value)
   const rootRef = useRef<HTMLDivElement>(null)
+  const filterRef = useRef<HTMLInputElement>(null)
+
+  const visibleGroups = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return GROUPS.map((g) => ({ ...g, eases: g.eases.filter((e) => e.includes(q)) })).filter(
+      (g) => g.eases.length > 0,
+    )
+  }, [query])
+  const visibleFlat = useMemo(() => visibleGroups.flatMap((g) => g.eases), [visibleGroups])
+
+  useEffect(() => {
+    if (!open) return
+    setQuery('')
+    setActiveEase(value)
+    filterRef.current?.focus()
+  }, [open, value])
 
   useEffect(() => {
     if (!open) return
@@ -32,30 +64,43 @@ export default function EasePicker({
     return () => document.removeEventListener('mousedown', onDocClick)
   }, [open])
 
+  const commit = (ease: string) => {
+    onChange(ease)
+    onPreview(null)
+    setOpen(false)
+  }
+
   const move = (delta: number) => {
-    setActiveIndex((i) => Math.min(ALL_EASES.length - 1, Math.max(0, i + delta)))
+    const list = visibleFlat.length ? visibleFlat : ALL_EASES
+    const i = list.indexOf(activeEase)
+    const next = list[Math.min(list.length - 1, Math.max(0, (i === -1 ? 0 : i) + delta))]
+    setActiveEase(next)
+    onPreview(next)
   }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
+    const list = visibleFlat.length ? visibleFlat : ALL_EASES
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      if (!open) setOpen(true)
-      else move(1)
+      move(1)
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       move(-1)
-    } else if (e.key === 'Enter' || e.key === ' ') {
+    } else if (e.key === 'Home') {
       e.preventDefault()
-      if (open) {
-        onChange(ALL_EASES[activeIndex])
-        onPreview(null)
-        setOpen(false)
-      } else {
-        setOpen(true)
-      }
+      setActiveEase(list[0])
+      onPreview(list[0])
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      setActiveEase(list[list.length - 1])
+      onPreview(list[list.length - 1])
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      commit(activeEase)
     } else if (e.key === 'Escape') {
-      setOpen(false)
+      e.preventDefault()
       onPreview(null)
+      setOpen(false)
     }
   }
 
@@ -67,53 +112,61 @@ export default function EasePicker({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        onKeyDown={onKeyDown}
       >
-        <svg viewBox="0 0 28 28" width="18" height="18" aria-hidden="true">
-          <path d={easeCurvePath(value)} fill="none" stroke="currentColor" strokeWidth="2" />
-        </svg>
-        {labelFor(value)}
+        <Curve name={value} />
+        {value === 'none' ? (
+          <span>
+            none <span className="ease-linear-note">linear</span>
+          </span>
+        ) : (
+          <span>{value}</span>
+        )}
         <ChevronDown size={14} />
       </button>
       {open && (
-        <div
-          role="listbox"
-          aria-activedescendant={`ease-opt-${activeIndex}`}
-          className="ease-popover"
-          tabIndex={-1}
-          onMouseLeave={() => onPreview(null)}
-        >
-          {GROUPS.map((group) => (
-            <div key={group.label} className="ease-group">
-              <span className="ease-group-label">{group.label}</span>
-              {group.eases.map((ease) => {
-                const index = ALL_EASES.indexOf(ease)
-                return (
+        <div className="ease-popover">
+          {SHOW_FILTER && (
+            <input
+              ref={filterRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="Filter eases"
+              className="ease-filter"
+              aria-label="Filter eases"
+            />
+          )}
+          <div role="listbox" aria-activedescendant={`ease-opt-${activeEase}`} className="ease-list" onMouseLeave={() => onPreview(null)}>
+            {visibleGroups.map((group) => (
+              <div key={group.label} className="ease-group">
+                <span className="ease-group-label">{group.label}</span>
+                {group.eases.map((ease) => (
                   <div
                     key={ease}
-                    id={`ease-opt-${index}`}
+                    id={`ease-opt-${ease}`}
                     role="option"
                     aria-selected={value === ease}
-                    className={index === activeIndex ? 'ease-option active' : 'ease-option'}
+                    className={ease === activeEase ? 'ease-option active' : 'ease-option'}
                     onMouseEnter={() => {
-                      setActiveIndex(index)
+                      setActiveEase(ease)
                       onPreview(ease)
                     }}
-                    onClick={() => {
-                      onChange(ease)
-                      onPreview(null)
-                      setOpen(false)
-                    }}
+                    onClick={() => commit(ease)}
                   >
-                    <svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true">
-                      <path d={easeCurvePath(ease)} fill="none" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                    {labelFor(ease)}
+                    <Curve name={ease} selected={value === ease} />
+                    {ease === 'none' ? (
+                      <span>
+                        none <span className="ease-linear-note">linear</span>
+                      </span>
+                    ) : (
+                      <span>{ease}</span>
+                    )}
                   </div>
-                )
-              })}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+            {visibleFlat.length === 0 && <p className="ease-no-match">No eases match “{query}”.</p>}
+          </div>
         </div>
       )}
     </div>

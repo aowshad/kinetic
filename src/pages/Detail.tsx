@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Check, Link2, Play, Repeat } from 'lucide-react'
+import { ArrowLeft, Check, Link2, Play, Repeat } from 'lucide-react'
 import catalog from '../animations/registry'
 import Stage from '../components/Stage'
 import ControlPanel, { type Align } from '../components/ControlPanel'
@@ -90,8 +90,9 @@ function DetailView({
     <div className="min-h-screen px-6 py-16">
       <div className="mx-auto max-w-[1100px]">
         <div className="detail-topbar">
-          <Link to="/" className="detail-back">
-            ← Back to gallery
+          <Link to="/" className="k-ghost-btn">
+            <ArrowLeft size={13} />
+            Back to gallery
           </Link>
           <button type="button" onClick={copyLink} className="k-ghost-btn">
             {linkCopied ? <Check size={13} /> : <Link2 size={13} />}
@@ -109,40 +110,40 @@ function DetailView({
               </span>
             ))}
           </div>
-          <div className="detail-actions">
-            {isHover ? (
-              <span className="k-hint">Hover the text</span>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={isPlaying}
-                  aria-label={`Play ${module.name} animation`}
-                  onClick={() => setReplayKey((k) => k + 1)}
-                  className="k-play-btn"
-                >
-                  <Play size={14} />
-                  {isPlaying ? 'Playing…' : 'Play'}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={autoLoop}
-                  aria-label="Loop playback every 1.2s"
-                  title="Loop playback every 1.2s"
-                  onClick={() => setAutoLoop((v) => !v)}
-                  className="k-play-btn"
-                >
-                  <Repeat size={14} />
-                  Loop
-                </button>
-              </>
-            )}
-          </div>
         </div>
         <p className="detail-blurb">{module.blurb}</p>
 
         <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
           <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+        </div>
+        <div className="stage-toolbar">
+          {isHover ? (
+            <span className="k-hint">Hover the text</span>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={isPlaying}
+                aria-label={`Play ${module.name} animation`}
+                onClick={() => setReplayKey((k) => k + 1)}
+                className="k-play-btn"
+              >
+                <Play size={14} />
+                {isPlaying ? 'Playing…' : 'Play'}
+              </button>
+              <button
+                type="button"
+                aria-pressed={autoLoop}
+                aria-label="Loop playback every 1.2s"
+                title="Loop playback every 1.2s"
+                onClick={() => setAutoLoop((v) => !v)}
+                className="k-play-btn"
+              >
+                <Repeat size={14} />
+                Loop
+              </button>
+            </>
+          )}
         </div>
 
         <ControlPanel

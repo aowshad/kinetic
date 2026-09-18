@@ -1,14 +1,14 @@
 import { gsap } from './gsap'
 
-export function easeCurvePath(name: string, size = 28, samples = 24): string {
+export function easeCurvePath(name: string, samples = 32): string {
   const fn = gsap.parseEase(name)
   let d = ''
   for (let i = 0; i <= samples; i++) {
     const t = i / samples
     const v = fn(t)
-    const x = (t * size).toFixed(1)
-    const y = (size - v * size).toFixed(1)
-    d += `${i === 0 ? 'M' : 'L'} ${x} ${y} `
+    d += `${i === 0 ? 'M' : 'L'} ${t.toFixed(3)} ${(1 - v).toFixed(3)} `
   }
   return d.trim()
 }
+
+export const EASE_DIAGONAL = 'M 0 1 L 1 0'

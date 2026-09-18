@@ -15,14 +15,16 @@ export default function ThemeControl({
   onChange: (m: ThemeMode) => void
 }) {
   return (
-    <div className="theme-control" role="group" aria-label="Theme">
+    <div className="theme-control" role="radiogroup" aria-label="Theme">
       {OPTIONS.map(({ mode: m, label, Icon }) => (
         <button
           key={m}
           type="button"
+          role="radio"
+          aria-checked={mode === m}
           aria-pressed={mode === m}
-          aria-label={`${label} theme`}
-          title={`${label} theme`}
+          aria-label={label}
+          title={label}
           onClick={() => onChange(m)}
           className="theme-control-btn"
         >

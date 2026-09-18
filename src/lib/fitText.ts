@@ -9,16 +9,16 @@ export function fitText(text: HTMLElement, box: HTMLElement, o: FitOptions = {})
 
   const cs = getComputedStyle(box)
   const availW = (box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) * safety
-  const availH = (box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) * safety
-  if (availW <= 0 || availH <= 0) return min
+  if (availW <= 0) return min
 
+  // Pass 1: fit on width alone — box height is content-driven, not fixed.
   let lo = min
   let hi = max
   let best = min
   while (lo <= hi) {
     const mid = (lo + hi) >> 1
     text.style.fontSize = `${mid}px`
-    if (text.scrollWidth <= availW && text.scrollHeight <= availH) {
+    if (text.scrollWidth <= availW) {
       best = mid
       lo = mid + 1
     } else {
@@ -26,5 +26,15 @@ export function fitText(text: HTMLElement, box: HTMLElement, o: FitOptions = {})
     }
   }
   text.style.fontSize = `${best}px`
+
+  // Pass 2: the box still has a max-block-size backstop — shrink if we blew past it.
+  const maxHeight = parseFloat(cs.maxHeight)
+  if (Number.isFinite(maxHeight)) {
+    while (best > min && text.scrollHeight > maxHeight) {
+      best -= 1
+      text.style.fontSize = `${best}px`
+    }
+  }
+
   return best
 }
