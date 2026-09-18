@@ -1,0 +1,13 @@
+.k-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.k-char-clip {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.k-char-mask {
+  display: inline-block;
+}
