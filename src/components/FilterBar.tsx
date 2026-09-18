@@ -1,33 +1,36 @@
-import { Moon, Search, Sun } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import type { Category, TextRole } from '../lib/types'
 
-interface FilterBarProps {
-  search: string
-  onSearchChange: (v: string) => void
-  categories: Category[]
-  category: Category | 'all'
-  onCategoryChange: (v: Category | 'all') => void
-  roles: TextRole[]
-  role: TextRole | 'all'
-  onRoleChange: (v: TextRole | 'all') => void
-  theme: 'dark' | 'light'
-  onThemeToggle: () => void
+interface PillOption<T extends string> {
+  value: T
+  count: number
 }
 
 export default function FilterBar({
   search,
   onSearchChange,
   categories,
-  category,
-  onCategoryChange,
+  selectedCategories,
+  onToggleCategory,
   roles,
-  role,
-  onRoleChange,
-  theme,
-  onThemeToggle,
-}: FilterBarProps) {
+  selectedRoles,
+  onToggleRole,
+  onClear,
+  hasActiveFilters,
+}: {
+  search: string
+  onSearchChange: (v: string) => void
+  categories: PillOption<Category>[]
+  selectedCategories: Category[]
+  onToggleCategory: (c: Category) => void
+  roles: PillOption<TextRole>[]
+  selectedRoles: TextRole[]
+  onToggleRole: (r: TextRole) => void
+  onClear: () => void
+  hasActiveFilters: boolean
+}) {
   return (
-    <div className="filter-bar">
+    <search className="filter-bar" aria-label="Filters">
       <label className="filter-search">
         <Search size={14} />
         <input
@@ -38,40 +41,49 @@ export default function FilterBar({
           aria-label="Search animations"
         />
       </label>
-      <div className="filter-pills" role="group" aria-label="Filter by category">
-        <button type="button" aria-pressed={category === 'all'} onClick={() => onCategoryChange('all')} className="k-pill">
-          All
-        </button>
-        {categories.map((c) => (
-          <button
-            key={c}
-            type="button"
-            aria-pressed={category === c}
-            onClick={() => onCategoryChange(c)}
-            className="k-pill"
-          >
-            {c}
-          </button>
-        ))}
+
+      <div className="filter-group">
+        <span className="filter-group-label">Category</span>
+        <div className="filter-pills" role="group" aria-label="Filter by category">
+          {categories.map(({ value, count }) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selectedCategories.includes(value)}
+              disabled={count === 0 && !selectedCategories.includes(value)}
+              onClick={() => onToggleCategory(value)}
+              className="k-pill"
+            >
+              {value} <span className="k-pill-count">{count}</span>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="filter-pills" role="group" aria-label="Filter by role">
-        <button type="button" aria-pressed={role === 'all'} onClick={() => onRoleChange('all')} className="k-pill">
-          All roles
-        </button>
-        {roles.map((r) => (
-          <button key={r} type="button" aria-pressed={role === r} onClick={() => onRoleChange(r)} className="k-pill">
-            {r}
-          </button>
-        ))}
+
+      <div className="filter-group">
+        <span className="filter-group-label">Text role</span>
+        <div className="filter-pills" role="group" aria-label="Filter by text role">
+          {roles.map(({ value, count }) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selectedRoles.includes(value)}
+              disabled={count === 0 && !selectedRoles.includes(value)}
+              onClick={() => onToggleRole(value)}
+              className="k-pill"
+            >
+              {value} <span className="k-pill-count">{count}</span>
+            </button>
+          ))}
+        </div>
       </div>
-      <button
-        type="button"
-        aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-        onClick={onThemeToggle}
-        className="k-theme-btn"
-      >
-        {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-      </button>
-    </div>
+
+      {hasActiveFilters && (
+        <button type="button" onClick={onClear} className="filter-clear">
+          <X size={13} />
+          Clear filters
+        </button>
+      )}
+    </search>
   )
 }

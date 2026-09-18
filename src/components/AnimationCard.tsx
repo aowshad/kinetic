@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Pause, Play } from 'lucide-react'
+import { Check, Link2, Pause, Play } from 'lucide-react'
 import Stage from './Stage'
 import CodeBlock from './CodeBlock'
 import { useAnimation } from '../lib/useAnimation'
@@ -8,12 +8,12 @@ import { useInView } from '../lib/useInView'
 import type { CatalogEntry, TextRole } from '../lib/types'
 
 const FIT_RANGES: Record<TextRole, { min: number; max: number }> = {
-  heading: { min: 16, max: 64 },
-  paragraph: { min: 12, max: 18 },
-  button: { min: 12, max: 18 },
-  link: { min: 12, max: 18 },
-  label: { min: 12, max: 18 },
-  counter: { min: 20, max: 64 },
+  heading: { min: 16, max: 56 },
+  paragraph: { min: 12, max: 16 },
+  button: { min: 12, max: 16 },
+  link: { min: 12, max: 16 },
+  label: { min: 12, max: 16 },
+  counter: { min: 18, max: 56 },
 }
 
 export default function AnimationCard({
@@ -28,6 +28,7 @@ export default function AnimationCard({
   const [replayKey, setReplayKey] = useState(0)
   const [showCode, setShowCode] = useState(false)
   const [openedOnce, setOpenedOnce] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const isLoop = module.category === 'loop'
   const [isPlaying, setIsPlaying] = useState(isLoop)
   const { ref: cardRef, inView } = useInView<HTMLElement>('100% 0px')
@@ -48,15 +49,34 @@ export default function AnimationCard({
     setOpenedOnce(true)
   }
 
+  const copyLink = async () => {
+    const url = `${location.origin}${location.pathname}#/a/${module.id}`
+    await navigator.clipboard.writeText(url)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2000)
+  }
+
   return (
-    <article ref={cardRef} className="k-card">
-      <header className="k-card-header">
-        <div className="k-title-group">
-          <h3 className="k-card-title">
-            <Link to={`/a/${module.id}`}>{module.name}</Link>
-          </h3>
-          <p className="k-chip">{module.category}</p>
+    <article ref={cardRef} id={module.id} className="k-card">
+      <div className="k-card-meta">
+        <div className="k-card-header">
+          <div className="k-title-group">
+            <h3 className="k-card-title">
+              <Link to={`/a/${module.id}`}>{module.name}</Link>
+            </h3>
+            <p className="k-chip">{module.category}</p>
+          </div>
+          <button
+            type="button"
+            onClick={copyLink}
+            aria-label={`Copy link to ${module.name}`}
+            title="Copy link"
+            className="k-icon-btn"
+          >
+            {linkCopied ? <Check size={14} /> : <Link2 size={14} />}
+          </button>
         </div>
+        <p className="k-blurb">{module.blurb}</p>
         <div className="k-card-actions">
           {isHover ? (
             <span className="k-hint">Hover the text</span>
@@ -80,20 +100,17 @@ export default function AnimationCard({
               className="k-play-btn"
             >
               <Play size={14} />
-              {isPlaying ? 'Playing…' : 'Play animation'}
+              {isPlaying ? 'Playing…' : 'Play'}
             </button>
           )}
           <button type="button" aria-expanded={showCode} onClick={toggleCode} className="k-ghost-btn">
             {showCode ? 'Hide code' : 'Show code'}
           </button>
         </div>
-      </header>
+      </div>
       <div className="stage" onClick={() => navigate(`/a/${module.id}`)}>
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
       </div>
-      <footer className="k-card-footer" onClick={() => navigate(`/a/${module.id}`)}>
-        <p className="k-blurb">{module.blurb}</p>
-      </footer>
       <div className="drawer" data-open={showCode}>
         <div className="drawer-inner">{openedOnce && <CodeBlock code={source} />}</div>
       </div>

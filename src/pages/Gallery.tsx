@@ -1,77 +1,234 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Check, Copy } from 'lucide-react'
+import pkg from '../../package.json'
 import catalog from '../animations/registry'
+import { ScrollTrigger } from '../lib/gsap'
 import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
+import SampleTextHero, { DEFAULT_SAMPLE_TEXT } from '../components/SampleTextHero'
+import ThemeControl from '../components/ThemeControl'
 import type { Category, TextRole } from '../lib/types'
+import type { ThemeMode } from '../lib/useTheme'
 
-const DEFAULT_TEXT = 'I Love Bangladesh'
+const CATEGORY_ORDER: Category[] = ['entrance', 'kinetic', 'scroll', 'hover', 'loop', 'exit']
+const ROLE_ORDER: TextRole[] = ['heading', 'paragraph', 'button', 'link', 'label', 'counter']
+const GSAP_VERSION = (pkg.dependencies.gsap as string).replace(/^[^0-9]*/, '')
 
 export default function Gallery({
   theme,
   onThemeToggle,
 }: {
-  theme: 'dark' | 'light'
-  onThemeToggle: () => void
+  theme: ThemeMode
+  onThemeToggle: (m: ThemeMode) => void
 }) {
-  const [inputValue, setInputValue] = useState(DEFAULT_TEXT)
-  const [sampleText, setSampleText] = useState(DEFAULT_TEXT)
+  const [inputValue, setInputValue] = useState(DEFAULT_SAMPLE_TEXT)
+  const [sampleText, setSampleText] = useState(DEFAULT_SAMPLE_TEXT)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<Category | 'all'>('all')
-  const [role, setRole] = useState<TextRole | 'all'>('all')
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
+  const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
+  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
+  const [installCopied, setInstallCopied] = useState(false)
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)
     return () => clearTimeout(id)
   }, [inputValue])
 
-  const categories = useMemo(() => Array.from(new Set(catalog.map((e) => e.module.category))), [])
-  const roles = useMemo(() => Array.from(new Set(catalog.flatMap((e) => e.module.roles))), [])
-
-  const filtered = catalog.filter((entry) => {
+  const searchFiltered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    const matchesSearch =
-      !q || entry.module.name.toLowerCase().includes(q) || entry.module.blurb.toLowerCase().includes(q)
-    const matchesCategory = category === 'all' || entry.module.category === category
-    const matchesRole = role === 'all' || entry.module.roles.includes(role)
-    return matchesSearch && matchesCategory && matchesRole
-  })
+    if (!q) return catalog
+    return catalog.filter(
+      (e) => e.module.name.toLowerCase().includes(q) || e.module.blurb.toLowerCase().includes(q),
+    )
+  }, [search])
+
+  const presentCategories = useMemo(
+    () => CATEGORY_ORDER.filter((c) => catalog.some((e) => e.module.category === c)),
+    [],
+  )
+  const presentRoles = useMemo(
+    () => ROLE_ORDER.filter((r) => catalog.some((e) => e.module.roles.includes(r))),
+    [],
+  )
+
+  const categoryCounts = presentCategories.map((value) => ({
+    value,
+    count: searchFiltered.filter(
+      (e) =>
+        e.module.category === value &&
+        (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))),
+    ).length,
+  }))
+
+  const roleCounts = presentRoles.map((value) => ({
+    value,
+    count: searchFiltered.filter(
+      (e) =>
+        e.module.roles.includes(value) &&
+        (selectedCategories.length === 0 || selectedCategories.includes(e.module.category)),
+    ).length,
+  }))
+
+  const filtered = searchFiltered.filter(
+    (e) =>
+      (selectedCategories.length === 0 || selectedCategories.includes(e.module.category)) &&
+      (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))),
+  )
+
+  const hasActiveFilters = search.length > 0 || selectedCategories.length > 0 || selectedRoles.length > 0
+
+  const clearFilters = () => {
+    setSearch('')
+    setSelectedCategories([])
+    setSelectedRoles([])
+  }
+
+  const toggleCategory = (c: Category) =>
+    setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]))
+  const toggleRole = (r: TextRole) =>
+    setSelectedRoles((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]))
+
+  const groups = presentCategories
+    .map((category) => ({ category, entries: filtered.filter((e) => e.module.category === category) }))
+    .filter((g) => g.entries.length > 0)
+
+  const groupsKey = groups.map((g) => g.category).join(',')
+  const sectionRefs = useRef(new Map<string, HTMLDivElement>())
+
+  useEffect(() => {
+    const sections = groups
+      .map(({ category }) => ({ category, el: sectionRefs.current.get(category) }))
+      .filter((s): s is { category: Category; el: HTMLDivElement } => !!s.el)
+    if (!sections.length) return
+
+    const line = 150
+    const update = () => {
+      let current = sections[0].category
+      for (const s of sections) {
+        if (s.el.getBoundingClientRect().top <= line) current = s.category
+      }
+      setActiveCategory(current)
+    }
+    const trigger = ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update })
+    update()
+    return () => trigger.kill()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupsKey])
+
+  const jumpTo = (category: string) => {
+    sectionRefs.current.get(category)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const copyInstall = async () => {
+    await navigator.clipboard.writeText('npm i gsap')
+    setInstallCopied(true)
+    setTimeout(() => setInstallCopied(false), 2000)
+  }
 
   return (
-    <div className="min-h-screen px-6 py-16">
-      <header className="mx-auto mb-10 max-w-[1100px] text-center">
-        <h1 className="text-4xl font-semibold">Kinetic</h1>
-        <p className="mt-3 text-sm text-[var(--muted)]">
-          Milestone 3 — detail view, live controls, and code tabs, on top of the gallery.
-        </p>
+    <div className="min-h-screen px-6 py-8">
+      <a href="#main" className="skip-link">
+        Skip to animations
+      </a>
+
+      <header className="page-header">
+        <div className="page-header-top">
+          <div>
+            <h1 className="page-title">Kinetic</h1>
+            <p className="page-subtitle">
+              {catalog.length} copy-paste text animations for GSAP. No dependencies beyond gsap.
+            </p>
+          </div>
+          <ThemeControl mode={theme} onChange={onThemeToggle} />
+        </div>
+        <div className="page-header-badges">
+          <button type="button" onClick={copyInstall} className="badge-btn">
+            {installCopied ? <Check size={12} /> : <Copy size={12} />}
+            npm i gsap · v{GSAP_VERSION}
+          </button>
+          <a
+            href="https://github.com/aowshad/kinetic"
+            target="_blank"
+            rel="noreferrer"
+            className="badge-link"
+          >
+            GitHub ↗
+          </a>
+        </div>
       </header>
-      <div className="mx-auto mb-6 max-w-[1100px]">
-        <label className="block max-w-md text-left text-xs text-[var(--muted)]">
-          Sample text
-          <input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]"
-          />
-        </label>
-      </div>
+
+      <SampleTextHero value={inputValue} onChange={setInputValue} />
+
       <FilterBar
         search={search}
         onSearchChange={setSearch}
-        categories={categories}
-        category={category}
-        onCategoryChange={setCategory}
-        roles={roles}
-        role={role}
-        onRoleChange={setRole}
-        theme={theme}
-        onThemeToggle={onThemeToggle}
+        categories={categoryCounts}
+        selectedCategories={selectedCategories}
+        onToggleCategory={toggleCategory}
+        roles={roleCounts}
+        selectedRoles={selectedRoles}
+        onToggleRole={toggleRole}
+        onClear={clearFilters}
+        hasActiveFilters={hasActiveFilters}
       />
-      <main className="k-gallery">
-        {filtered.map((entry) => (
-          <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} />
+
+      {hasActiveFilters && (
+        <p className="result-count" aria-live="polite">
+          Showing {filtered.length} of {catalog.length} animations
+        </p>
+      )}
+
+      <nav className="jump-nav" aria-label="Jump to category">
+        {groups.map(({ category }) => (
+          <button
+            key={category}
+            type="button"
+            onClick={() => jumpTo(category)}
+            className={activeCategory === category ? 'active' : ''}
+          >
+            {category}
+          </button>
         ))}
-        {filtered.length === 0 && <p className="k-empty">No animations match those filters.</p>}
+      </nav>
+
+      <main id="main" className="k-gallery">
+        {groups.map(({ category, entries }) => (
+          <div
+            key={category}
+            id={`section-${category}`}
+            ref={(el) => {
+              if (el) sectionRefs.current.set(category, el)
+              else sectionRefs.current.delete(category)
+            }}
+            className="section-group"
+          >
+            <h2 className="section-heading">
+              {category} <span>· {entries.length}</span>
+            </h2>
+            {entries.map((entry) => (
+              <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} />
+            ))}
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="k-empty">
+            <p>No animations match those filters.</p>
+            <button type="button" onClick={clearFilters} className="filter-clear">
+              Clear filters
+            </button>
+          </div>
+        )}
       </main>
+
+      <footer className="page-footer">
+        <span>MIT licence</span>
+        <a href="https://github.com/aowshad/kinetic" target="_blank" rel="noreferrer">
+          Contribute
+        </a>
+        <a href="https://gsap.com" target="_blank" rel="noreferrer">
+          Built with GSAP
+        </a>
+      </footer>
     </div>
   )
 }
