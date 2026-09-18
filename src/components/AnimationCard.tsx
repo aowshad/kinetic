@@ -49,7 +49,7 @@ export default function AnimationCard({
   return (
     <article ref={cardRef} className="k-card">
       <header className="k-card-header">
-        <div>
+        <div className="k-title-group">
           <h3 className="k-card-title">{module.name}</h3>
           <p className="k-chip">{module.category}</p>
         </div>
