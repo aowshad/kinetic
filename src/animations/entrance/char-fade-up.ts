@@ -1,7 +1,7 @@
 import { gsap, SplitText } from '../../lib/gsap'
 import type { AnimationModule } from '../../lib/types'
 
-const run: AnimationModule['run'] = (el, o) => {
+const run: AnimationModule['run'] = (el, o, onComplete) => {
   el.setAttribute('aria-label', el.textContent ?? '')
   const split = new SplitText(el, { type: 'words,chars', wordsClass: 'k-word', charsClass: 'k-char' })
   split.words.forEach((w) => w.setAttribute('aria-hidden', 'true'))
@@ -14,7 +14,7 @@ const run: AnimationModule['run'] = (el, o) => {
     stagger: o.stagger,
     ease: o.ease,
     onStart: () => gsap.set(split.chars, { willChange: 'transform, opacity' }),
-    onComplete: () => gsap.set(split.chars, { willChange: 'auto' }),
+    onComplete: () => { gsap.set(split.chars, { willChange: 'auto' }); onComplete?.() },
   })
 
   return () => {

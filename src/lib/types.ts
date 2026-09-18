@@ -17,7 +17,8 @@ export interface AnimationModule {
   blurb: string
   defaults: AnimationOptions
   plugins: string[]
-  run: (el: HTMLElement, o: AnimationOptions) => gsap.core.Timeline | (() => void)
+  fitSafety?: number
+  run: (el: HTMLElement, o: AnimationOptions, onComplete?: () => void) => gsap.core.Timeline | (() => void)
 }
 
 export interface CatalogEntry {

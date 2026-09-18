@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import catalog from './animations/registry'
 import AnimationCard from './components/AnimationCard'
 
@@ -6,8 +6,14 @@ const DEFAULT_TEXT = 'I Love Bangladesh'
 const DENSITIES = [1, 2, 3] as const
 
 function App() {
+  const [inputValue, setInputValue] = useState(DEFAULT_TEXT)
   const [sampleText, setSampleText] = useState(DEFAULT_TEXT)
   const [density, setDensity] = useState<(typeof DENSITIES)[number]>(1)
+
+  useEffect(() => {
+    const id = setTimeout(() => setSampleText(inputValue), 300)
+    return () => clearTimeout(id)
+  }, [inputValue])
 
   return (
     <div className="min-h-screen px-6 py-16">
@@ -22,8 +28,8 @@ function App() {
         <label className="block max-w-md flex-1 text-left text-xs text-[var(--muted)]">
           Sample text
           <input
-            value={sampleText}
-            onChange={(e) => setSampleText(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             className="mt-1 w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]"
           />
         </label>
