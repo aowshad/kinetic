@@ -58,37 +58,10 @@ pre,
 
 .k-gallery {
   display: grid;
-  grid-template-columns: repeat(var(--density, 1), minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
   max-inline-size: 1100px;
   margin-inline: auto;
-}
-
-.density-toggle {
-  display: inline-flex;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.density-toggle button {
-  inline-size: 32px;
-  block-size: 32px;
-  background: transparent;
-  border: none;
-  border-inline-start: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.density-toggle button:first-child {
-  border-inline-start: none;
-}
-
-.density-toggle button[aria-pressed="true"] {
-  background: var(--bg);
-  color: var(--accent);
 }
 
 /* ---------- card ---------- */
