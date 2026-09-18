@@ -20,7 +20,7 @@ const scramble: AnimationModule = {
   blurb: 'Characters scramble through random glyphs before locking into the final text.',
   defaults: { duration: 1.2, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['ScrambleTextPlugin'],
-  fitSafety: 0.9,
+  fitSafety: 0.78,
   run,
 }
 

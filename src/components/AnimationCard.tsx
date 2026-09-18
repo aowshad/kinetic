@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Pause, Play } from 'lucide-react'
 import Stage from './Stage'
 import CodeBlock from './CodeBlock'
@@ -23,6 +24,7 @@ export default function AnimationCard({
   sampleText: string
 }) {
   const { module, source } = entry
+  const navigate = useNavigate()
   const [replayKey, setReplayKey] = useState(0)
   const [showCode, setShowCode] = useState(false)
   const [openedOnce, setOpenedOnce] = useState(false)
@@ -50,7 +52,9 @@ export default function AnimationCard({
     <article ref={cardRef} className="k-card">
       <header className="k-card-header">
         <div className="k-title-group">
-          <h3 className="k-card-title">{module.name}</h3>
+          <h3 className="k-card-title">
+            <Link to={`/a/${module.id}`}>{module.name}</Link>
+          </h3>
           <p className="k-chip">{module.category}</p>
         </div>
         <div className="k-card-actions">
@@ -84,10 +88,10 @@ export default function AnimationCard({
           </button>
         </div>
       </header>
-      <div className="stage">
+      <div className="stage" onClick={() => navigate(`/a/${module.id}`)}>
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
       </div>
-      <footer className="k-card-footer">
+      <footer className="k-card-footer" onClick={() => navigate(`/a/${module.id}`)}>
         <p className="k-blurb">{module.blurb}</p>
       </footer>
       <div className="drawer" data-open={showCode}>
