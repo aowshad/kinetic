@@ -1,0 +1,7 @@
+.k-mono {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.k-char {
+  display: inline-block;
+}

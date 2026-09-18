@@ -1,0 +1,12 @@
+.k-type-caret::after {
+  content: "|";
+  display: inline-block;
+  margin-inline-start: 2px;
+  animation: k-caret-blink 1s steps(1) infinite;
+}
+
+@keyframes k-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
