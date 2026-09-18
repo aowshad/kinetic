@@ -1,0 +1,8 @@
+.k-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.k-char {
+  display: inline-block;
+}
