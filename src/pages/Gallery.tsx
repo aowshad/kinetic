@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import pkg from '../../package.json'
 import catalog from '../animations/registry'
-import { ScrollTrigger } from '../lib/gsap'
 import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
 import SampleTextHero from '../components/SampleTextHero'
@@ -28,21 +27,37 @@ export default function Gallery({
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
   const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-  const [condensed, setCondensed] = useState(false)
+  const [stuck, setStuck] = useState(false)
   const [installCopied, setInstallCopied] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const filterBarRef = useRef<HTMLElement>(null)
+  const activeCategoryRef = useRef<Category | null>(null)
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)
     return () => clearTimeout(id)
   }, [inputValue])
 
+  // Detect "stuck" via a 1px sentinel just above the bar — not a scroll listener,
+  // so this never fires on every scroll tick and never depends on the bar's own height.
   useEffect(() => {
     const el = sentinelRef.current
     if (!el) return
-    const observer = new IntersectionObserver(([entry]) => setCondensed(!entry.isIntersecting))
+    const observer = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting))
     observer.observe(el)
     return () => observer.disconnect()
+  }, [])
+
+  // The bar's rendered height never changes with scroll position (no condense-on-scroll),
+  // so measuring it once per layout and exposing it as a CSS var is safe and cheap.
+  useEffect(() => {
+    const el = filterBarRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      document.documentElement.style.setProperty('--filter-bar-height', `${entry.target.getBoundingClientRect().height}px`)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   const searchFiltered = useMemo(() => {
@@ -106,25 +121,37 @@ export default function Gallery({
   const groupsKey = groups.map((g) => g.category).join(',')
   const sectionRefs = useRef(new Map<string, HTMLDivElement>())
 
+  // Scroll-spy: IntersectionObserver on each section heading's container, watching a thin
+  // band just under the sticky bar. setState only fires when the active id actually changes.
   useEffect(() => {
-    const sections = groups
+    const entries = groups
       .map(({ category }) => ({ category, el: sectionRefs.current.get(category) }))
       .filter((s): s is { category: Category; el: HTMLDivElement } => !!s.el)
-    if (!sections.length) return
+    if (!entries.length) return
 
-    const line = 150
-    const update = () => {
-      let current = sections[0].category
-      for (const s of sections) {
-        if (s.el.getBoundingClientRect().top <= line) current = s.category
-      }
-      setActiveCategory(current)
-    }
-    const trigger = ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update })
-    update()
-    return () => trigger.kill()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const targetToCategory = new Map<Element, Category>(entries.map(({ category, el }) => [el, category]))
+    const barHeight = filterBarRef.current?.getBoundingClientRect().height ?? 0
+    const observer = new IntersectionObserver(
+      (observed) => {
+        for (const entry of observed) {
+          if (!entry.isIntersecting) continue
+          const category = targetToCategory.get(entry.target)
+          if (category && category !== activeCategoryRef.current) {
+            activeCategoryRef.current = category
+            setActiveCategory(category)
+          }
+        }
+      },
+      { rootMargin: `-${barHeight + 4}px 0px -70% 0px`, threshold: 0 },
+    )
+    entries.forEach(({ el }) => observer.observe(el))
+    return () => observer.disconnect()
   }, [groupsKey])
+
+  const viewingLabel =
+    selectedCategories.length === 0 && activeCategory
+      ? activeCategory[0].toUpperCase() + activeCategory.slice(1)
+      : null
 
   const copyInstall = async () => {
     await navigator.clipboard.writeText('npm i gsap')
@@ -169,18 +196,19 @@ export default function Gallery({
       <div ref={sentinelRef} />
 
       <FilterBar
-        condensed={condensed}
+        ref={filterBarRef}
+        stuck={stuck}
         search={search}
         onSearchChange={setSearch}
         categories={categoryCounts}
         selectedCategories={selectedCategories}
         onToggleCategory={toggleCategory}
-        activeCategory={activeCategory}
         roles={roleCounts}
         selectedRoles={selectedRoles}
         onToggleRole={toggleRole}
         onClear={clearFilters}
         hasActiveFilters={hasActiveFilters}
+        viewingLabel={viewingLabel}
       />
 
       {hasActiveFilters && (
