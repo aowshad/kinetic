@@ -746,6 +746,82 @@ pre,
   block-size: 1lh;
 }
 
+/* ---------- underline wipe ---------- */
+
+.k-underline {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: -2px;
+  inline-size: 100%;
+  block-size: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* ---------- char mask up ---------- */
+
+.k-char-clip {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.k-char-mask {
+  display: inline-block;
+}
+
+/* ---------- line mask up ---------- */
+
+.k-line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.k-line {
+  display: block;
+}
+
+/* ---------- glitch ---------- */
+
+.k-glitch-red,
+.k-glitch-cyan {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  pointer-events: none;
+}
+
+.k-glitch-red {
+  color: #ff004c;
+  mix-blend-mode: screen;
+}
+
+.k-glitch-cyan {
+  color: #00e5ff;
+  mix-blend-mode: screen;
+}
+
+/* ---------- decode matrix ---------- */
+
+.k-mono {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+/* ---------- typewriter ---------- */
+
+.k-type-caret::after {
+  content: "|";
+  display: inline-block;
+  margin-inline-start: 2px;
+  animation: k-caret-blink 1s steps(1) infinite;
+}
+
+@keyframes k-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* ---------- code drawer ---------- */
 
 .drawer {

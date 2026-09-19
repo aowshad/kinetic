@@ -30,6 +30,17 @@ const Stage = forwardRef<HTMLElement, StageProps>(({ role, text }, ref) => {
           {text}
         </button>
       )
+    case 'link':
+      return (
+        <a
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href="#"
+          onClick={(e) => e.preventDefault()}
+          className="stage-link text-[var(--accent)]"
+        >
+          {text}
+        </a>
+      )
     case 'counter':
       return (
         <span ref={ref as React.Ref<HTMLSpanElement>} className="stage-counter font-mono">
