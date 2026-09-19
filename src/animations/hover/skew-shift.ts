@@ -1,0 +1,26 @@
+import { gsap } from '../../lib/gsap'
+import type { AnimationModule } from '../../lib/types'
+
+const run: AnimationModule['run'] = (el, o) => {
+  // #region body
+  el.style.display = 'inline-block'
+  const enter = () => gsap.to(el, { skewX: -8, x: 6, duration: o.duration, ease: o.ease, overwrite: true })
+  const leave = () => gsap.to(el, { skewX: 0, x: 0, duration: o.duration, ease: o.ease, overwrite: true })
+  const ons = [['pointerenter', enter], ['pointerleave', leave], ['focus', enter], ['blur', leave]] as const
+  ons.forEach(([e, fn]) => el.addEventListener(e, fn))
+  return () => {
+    gsap.killTweensOf(el)
+    ons.forEach(([e, fn]) => el.removeEventListener(e, fn))
+    gsap.set(el, { clearProps: 'skewX,x' })
+    el.style.display = ''
+  }
+  // #endregion body
+}
+const skewShift: AnimationModule = {
+  id: 'skew-shift', name: 'Skew Shift', category: 'hover',
+  roles: ['button', 'link', 'label'], tags: ['hover', 'skew'],
+  blurb: 'Hover or focus to skew and nudge the text sideways.',
+  defaults: { duration: 0.3, stagger: 0, delay: 0, ease: 'power3.out' },
+  plugins: [], run,
+}
+export default skewShift
