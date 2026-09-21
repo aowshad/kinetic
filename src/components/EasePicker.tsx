@@ -1,13 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { EASE_DIAGONAL, easeCurvePath } from '../lib/easeCurve'
+import { EASE_GROUPS as GROUPS, ALL_EASES } from '../lib/eases'
 
-const GROUPS = [
-  { label: 'Standard', eases: ['none', 'power1.out', 'power1.inOut', 'power2.out', 'power2.inOut', 'power3.out', 'power3.inOut', 'power4.out'] },
-  { label: 'Expressive', eases: ['expo.out', 'circ.out', 'sine.inOut'] },
-  { label: 'Overshoot', eases: ['back.out(1.7)', 'elastic.out(1, 0.3)', 'bounce.out'] },
-]
-const ALL_EASES = GROUPS.flatMap((g) => g.eases)
 const SHOW_FILTER = ALL_EASES.length > 12
 
 function Curve({ name, selected }: { name: string; selected?: boolean }) {

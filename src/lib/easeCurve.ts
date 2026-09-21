@@ -1,13 +1,12 @@
-import { gsap } from './gsap'
+import { sampleEase } from './sampleEase'
 
 export function easeCurvePath(name: string, samples = 32): string {
-  const fn = gsap.parseEase(name)
+  const values = sampleEase(name, samples + 1)
   let d = ''
-  for (let i = 0; i <= samples; i++) {
+  values.forEach((v, i) => {
     const t = i / samples
-    const v = fn(t)
     d += `${i === 0 ? 'M' : 'L'} ${t.toFixed(3)} ${(1 - v).toFixed(3)} `
-  }
+  })
   return d.trim()
 }
 
