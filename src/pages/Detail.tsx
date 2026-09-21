@@ -57,6 +57,7 @@ function DetailView({
   const [replayKey, setReplayKey] = useState(0)
   const [autoLoop, setAutoLoop] = useState(false)
   const isHover = module.category === 'hover'
+  const isScroll = module.category === 'scroll'
   const [isPlaying, setIsPlaying] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
 
@@ -119,6 +120,8 @@ function DetailView({
         <div className="stage-toolbar">
           {isHover ? (
             <span className="k-hint">Hover the text</span>
+          ) : isScroll ? (
+            <span className="k-hint">Scroll the page</span>
           ) : (
             <>
               <button

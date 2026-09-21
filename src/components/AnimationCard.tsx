@@ -34,6 +34,7 @@ export default function AnimationCard({
   const [isPlaying, setIsPlaying] = useState(isLoop)
   const { ref: cardRef, inView } = useInView<HTMLElement>('100% 0px')
   const isHover = module.category === 'hover'
+  const isScroll = module.category === 'scroll'
   const active = isLoop ? inView && isPlaying : inView
   const stageKey = `${sampleText}::${replayKey}`
   const ref = useAnimation<HTMLElement>(
@@ -93,6 +94,8 @@ export default function AnimationCard({
         <div className="k-card-actions">
           {isHover ? (
             <span className="k-hint">Hover the text</span>
+          ) : isScroll ? (
+            <span className="k-hint">Scroll the page</span>
           ) : isLoop ? (
             <button
               type="button"
@@ -125,9 +128,9 @@ export default function AnimationCard({
         </div>
       </div>
       <div
-        className={isHover ? 'stage' : 'stage stage-clickable'}
-        onClick={isHover ? undefined : replay}
-        onMouseEnter={isHover ? undefined : onStageMouseEnter}
+        className={isHover || isScroll ? 'stage' : 'stage stage-clickable'}
+        onClick={isHover || isScroll ? undefined : replay}
+        onMouseEnter={isHover || isScroll ? undefined : onStageMouseEnter}
       >
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
         {showHint && <span className="stage-hint">Click to replay</span>}
