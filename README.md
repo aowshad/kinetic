@@ -1,20 +1,36 @@
 # Kinetic
 
-A gallery of GSAP-powered text animations, each with a live preview and a
+A gallery of 45 GSAP-powered text animations, each with a live preview and a
 copy-paste code snippet. Static site, no backend.
 
-## Status
+**[Live demo →](https://aowshad.github.io/kinetic/)**
 
-**Milestone 1** — scaffold, animation contract, and the registry's raw-source
-pairing, proven across three categories:
+## What's here
 
-- `char-fade-up` (entrance) — SplitText chars fade + rise in
-- `scramble` (kinetic) — ScrambleTextPlugin locks into the final text
-- `text-roll` (hover) — two stacked copies swap on pointer enter/leave
+- **45 animations across 6 categories** — entrance (12), kinetic (10),
+  scroll (7), hover (8), loop (5), exit (3).
+- **Live, editable preview** — type anything into the sample text field and
+  every animation re-runs with your own words.
+- **Real code, not a demo of a demo** — each card's code panel renders the
+  literal source file that powers its own preview, emitted as either plain
+  Vanilla JS or a React component, with your current duration/stagger/delay/
+  ease baked in.
+- **Live controls** — duration, stagger, delay, and ease (with a visual curve
+  picker) all update the running preview immediately.
+- **Search and filter** — by category, by text role (heading, button, link,
+  counter, …), or by keyword.
+- **Light/dark theme**, following the system by default.
 
-Edit the sample text at the top of the page to see every animation re-run
-with your own words. Each card's code panel renders the literal source file
-that powers its preview — no hand-written duplicate snippet.
+## Categories
+
+| Category | Trigger | Count |
+|---|---|---|
+| Entrance | plays once when scrolled into view | 12 |
+| Kinetic | plays once, or loops in place | 10 |
+| Scroll | scrubbed directly to scroll position (`ScrollTrigger`) | 7 |
+| Hover | plays on pointer enter/focus | 8 |
+| Loop | repeats forever | 5 |
+| Exit | plays once, ending hidden | 3 |
 
 ## Stack
 
