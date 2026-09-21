@@ -44,8 +44,7 @@ export function useAnimation<T extends HTMLElement>(
       if (cancelled) return
       fitText(el, box, { ...fitRange, safety: module.fitSafety ?? 1 })
       onPlaying?.(true)
-      const result = module.run(el, options, () => onPlaying?.(false))
-      cleanup = typeof result === 'function' ? result : () => result.progress(1).kill()
+      cleanup = module.impl.gsap(el, options, () => onPlaying?.(false))
     })
 
     return () => {

@@ -1,0 +1,14 @@
+import type { AnimationModule } from '../../../lib/types'
+import { run } from './gsap'
+
+const randomOrderFade: AnimationModule = {
+  id: 'random-order-fade', name: 'Random Order Fade', category: 'entrance',
+  roles: ['heading', 'paragraph', 'label'], tags: ['split', 'random'],
+  blurb: 'Characters fade in one by one in a random order.',
+  defaults: { duration: 0.4, stagger: 0.03, delay: 0, ease: 'power1.out' },
+  plugins: ['SplitText'],
+  vanilla: 'none',
+  impl: { gsap: run },
+}
+
+export default randomOrderFade
