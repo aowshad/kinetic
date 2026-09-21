@@ -6,7 +6,7 @@ const run: AnimationModule['run'] = (el, o) => {
   el.setAttribute('aria-label', el.textContent ?? '')
   const split = new SplitText(el, { type: 'words,chars', wordsClass: 'k-word', charsClass: 'k-char' })
   split.words.forEach((w) => w.setAttribute('aria-hidden', 'true'))
-  let tl: gsap.core.Tween | null = null
+  let tl: gsap.core.Tween | null = null // @emit: let tl = null
   const enter = () => {
     tl?.kill()
     tl = gsap.to(split.chars, {

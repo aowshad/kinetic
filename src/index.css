@@ -736,6 +736,14 @@ pre,
   transform: scaleX(0);
 }
 
+/* ---------- ink fill ---------- */
+
+.k-ink-fill {
+  position: absolute;
+  inset: 0;
+  color: var(--accent);
+}
+
 /* ---------- char mask up ---------- */
 
 .k-char-clip {
