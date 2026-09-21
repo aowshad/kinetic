@@ -799,6 +799,32 @@ pre,
   }
 }
 
+/* ---------- neon flicker ---------- */
+
+.k-neon {
+  color: var(--text);
+  text-shadow: 0 0 4px var(--accent), 0 0 12px var(--accent), 0 0 24px var(--accent);
+}
+
+/* ---------- shimmer sweep ---------- */
+
+.k-shimmer {
+  background-image: linear-gradient(100deg, var(--text) 40%, var(--accent) 50%, var(--text) 60%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- weight morph ---------- */
+
+.k-weight-bold {
+  position: absolute;
+  inset: 0;
+  font-weight: 800;
+  opacity: 0;
+}
+
 /* ---------- code drawer ---------- */
 
 .drawer {

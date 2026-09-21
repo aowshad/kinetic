@@ -1,0 +1,4 @@
+.k-neon {
+  color: var(--text);
+  text-shadow: 0 0 4px var(--accent), 0 0 12px var(--accent), 0 0 24px var(--accent);
+}
