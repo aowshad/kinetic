@@ -274,20 +274,9 @@ pre,
 /* ---------- filter bar ---------- */
 
 .filter-bar {
-  position: sticky;
-  inset-block-start: 0;
-  z-index: 50;
-  margin-inline: -24px;
-  inline-size: calc(100% + 48px);
-  padding-inline: 24px;
   padding-block: 16px;
-  border-block-end: 1px solid transparent;
-  background: transparent;
-}
-
-.filter-bar.stuck {
+  border-block-end: 1px solid var(--border);
   background: var(--bg);
-  border-block-end-color: var(--border);
 }
 
 .filter-bar-inner {
@@ -302,13 +291,6 @@ pre,
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.filter-viewing {
-  margin-inline-start: auto;
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
 }
 
 .filter-search {
@@ -464,13 +446,8 @@ pre,
 /* ---------- section headings ---------- */
 
 .section-heading {
-  position: sticky;
-  inset-block-start: var(--filter-bar-height, 84px);
-  scroll-margin-top: var(--filter-bar-height, 84px);
-  z-index: 5;
   margin: 8px 0 -4px;
   padding: 8px 4px;
-  background: var(--bg);
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;

@@ -1,4 +1,3 @@
-import { forwardRef } from 'react'
 import { Search, X } from 'lucide-react'
 import type { Category, TextRole } from '../lib/types'
 
@@ -7,8 +6,18 @@ interface PillOption<T extends string> {
   count: number
 }
 
-const FilterBar = forwardRef<HTMLElement, {
-  stuck: boolean
+export default function FilterBar({
+  search,
+  onSearchChange,
+  categories,
+  selectedCategories,
+  onToggleCategory,
+  roles,
+  selectedRoles,
+  onToggleRole,
+  onClear,
+  hasActiveFilters,
+}: {
   search: string
   onSearchChange: (v: string) => void
   categories: PillOption<Category>[]
@@ -19,26 +28,9 @@ const FilterBar = forwardRef<HTMLElement, {
   onToggleRole: (r: TextRole) => void
   onClear: () => void
   hasActiveFilters: boolean
-  viewingLabel: string | null
-}>(function FilterBar(
-  {
-    stuck,
-    search,
-    onSearchChange,
-    categories,
-    selectedCategories,
-    onToggleCategory,
-    roles,
-    selectedRoles,
-    onToggleRole,
-    onClear,
-    hasActiveFilters,
-    viewingLabel,
-  },
-  ref,
-) {
+}) {
   return (
-    <search ref={ref} className={stuck ? 'filter-bar stuck' : 'filter-bar'} aria-label="Filters">
+    <search className="filter-bar" aria-label="Filters">
       <div className="filter-bar-inner">
         <div className="filter-search-row">
           <label className="filter-search">
@@ -51,7 +43,6 @@ const FilterBar = forwardRef<HTMLElement, {
               aria-label="Search animations"
             />
           </label>
-          {viewingLabel && <span className="filter-viewing">Viewing: {viewingLabel}</span>}
         </div>
 
         <div className="filter-group">
@@ -104,6 +95,4 @@ const FilterBar = forwardRef<HTMLElement, {
       </div>
     </search>
   )
-})
-
-export default FilterBar
+}

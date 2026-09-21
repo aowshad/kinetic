@@ -26,39 +26,12 @@ export default function Gallery({
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
-  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-  const [stuck, setStuck] = useState(false)
   const [installCopied, setInstallCopied] = useState(false)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-  const filterBarRef = useRef<HTMLElement>(null)
-  const activeCategoryRef = useRef<Category | null>(null)
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)
     return () => clearTimeout(id)
   }, [inputValue])
-
-  // Detect "stuck" via a 1px sentinel just above the bar — not a scroll listener,
-  // so this never fires on every scroll tick and never depends on the bar's own height.
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting))
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  // The bar's rendered height never changes with scroll position (no condense-on-scroll),
-  // so measuring it once per layout and exposing it as a CSS var is safe and cheap.
-  useEffect(() => {
-    const el = filterBarRef.current
-    if (!el) return
-    const ro = new ResizeObserver(([entry]) => {
-      document.documentElement.style.setProperty('--filter-bar-height', `${entry.target.getBoundingClientRect().height}px`)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
 
   const searchFiltered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -118,40 +91,7 @@ export default function Gallery({
     .map((category) => ({ category, entries: filtered.filter((e) => e.module.category === category) }))
     .filter((g) => g.entries.length > 0)
 
-  const groupsKey = groups.map((g) => g.category).join(',')
   const sectionRefs = useRef(new Map<string, HTMLDivElement>())
-
-  // Scroll-spy: IntersectionObserver on each section heading's container, watching a thin
-  // band just under the sticky bar. setState only fires when the active id actually changes.
-  useEffect(() => {
-    const entries = groups
-      .map(({ category }) => ({ category, el: sectionRefs.current.get(category) }))
-      .filter((s): s is { category: Category; el: HTMLDivElement } => !!s.el)
-    if (!entries.length) return
-
-    const targetToCategory = new Map<Element, Category>(entries.map(({ category, el }) => [el, category]))
-    const barHeight = filterBarRef.current?.getBoundingClientRect().height ?? 0
-    const observer = new IntersectionObserver(
-      (observed) => {
-        for (const entry of observed) {
-          if (!entry.isIntersecting) continue
-          const category = targetToCategory.get(entry.target)
-          if (category && category !== activeCategoryRef.current) {
-            activeCategoryRef.current = category
-            setActiveCategory(category)
-          }
-        }
-      },
-      { rootMargin: `-${barHeight + 4}px 0px -70% 0px`, threshold: 0 },
-    )
-    entries.forEach(({ el }) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [groupsKey])
-
-  const viewingLabel =
-    selectedCategories.length === 0 && activeCategory
-      ? activeCategory[0].toUpperCase() + activeCategory.slice(1)
-      : null
 
   const copyInstall = async () => {
     await navigator.clipboard.writeText('npm i gsap')
@@ -193,11 +133,7 @@ export default function Gallery({
 
       <SampleTextHero value={inputValue} onChange={setInputValue} />
 
-      <div ref={sentinelRef} />
-
       <FilterBar
-        ref={filterBarRef}
-        stuck={stuck}
         search={search}
         onSearchChange={setSearch}
         categories={categoryCounts}
@@ -208,7 +144,6 @@ export default function Gallery({
         onToggleRole={toggleRole}
         onClear={clearFilters}
         hasActiveFilters={hasActiveFilters}
-        viewingLabel={viewingLabel}
       />
 
       {hasActiveFilters && (
