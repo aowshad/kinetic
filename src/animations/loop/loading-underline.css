@@ -1,0 +1,8 @@
+.k-loop-underline {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: -4px;
+  inline-size: 40%;
+  block-size: 2px;
+  background: var(--accent);
+}
