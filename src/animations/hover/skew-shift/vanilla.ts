@@ -5,8 +5,8 @@ export const run: AnimationImpl = (el, o) => {
   // #region body
   el.style.display = 'inline-block'
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let current: Animation | null = null
-  const animateTo = (transform: string) => {
+  let current: Animation | null = null // @emit: let current = null
+  const animateTo = (transform: string) => { // @emit: const animateTo = (transform) => {
     const from = getComputedStyle(el).transform
     current?.cancel()
     current = el.animate([{ transform: from }, { transform }], {

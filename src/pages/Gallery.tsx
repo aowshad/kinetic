@@ -26,6 +26,7 @@ export default function Gallery({
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
+  const [noDepsOnly, setNoDepsOnly] = useState(false)
   const [installCopied, setInstallCopied] = useState(false)
 
   useEffect(() => {
@@ -71,15 +72,18 @@ export default function Gallery({
   const filtered = searchFiltered.filter(
     (e) =>
       (selectedCategories.length === 0 || selectedCategories.includes(e.module.category)) &&
-      (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))),
+      (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))) &&
+      (!noDepsOnly || e.module.vanilla !== 'none'),
   )
 
-  const hasActiveFilters = search.length > 0 || selectedCategories.length > 0 || selectedRoles.length > 0
+  const hasActiveFilters =
+    search.length > 0 || selectedCategories.length > 0 || selectedRoles.length > 0 || noDepsOnly
 
   const clearFilters = () => {
     setSearch('')
     setSelectedCategories([])
     setSelectedRoles([])
+    setNoDepsOnly(false)
   }
 
   const toggleCategory = (c: Category) =>
@@ -92,6 +96,9 @@ export default function Gallery({
     .filter((g) => g.entries.length > 0)
 
   const sectionRefs = useRef(new Map<string, HTMLDivElement>())
+
+  const zeroDepCount = useMemo(() => catalog.filter((e) => e.module.vanilla !== 'none').length, [])
+  const fullDepCount = useMemo(() => catalog.filter((e) => e.module.vanilla === 'full').length, [])
 
   const copyInstall = async () => {
     await navigator.clipboard.writeText('npm i gsap')
@@ -110,7 +117,9 @@ export default function Gallery({
           <div>
             <h1 className="page-title">Kinetic</h1>
             <p className="page-subtitle">
-              {catalog.length} copy-paste text animations for GSAP. No dependencies beyond gsap.
+              {catalog.length} copy-paste text animations. {zeroDepCount} of {catalog.length} run with zero
+              dependencies — {fullDepCount} at full fidelity, {zeroDepCount - fullDepCount} with minor caveats
+              on older browsers. We tell you which is which.
             </p>
           </div>
           <ThemeControl mode={theme} onChange={onThemeToggle} />
@@ -142,6 +151,8 @@ export default function Gallery({
         roles={roleCounts}
         selectedRoles={selectedRoles}
         onToggleRole={toggleRole}
+        noDepsOnly={noDepsOnly}
+        onToggleNoDeps={() => setNoDepsOnly((v) => !v)}
         onClear={clearFilters}
         hasActiveFilters={hasActiveFilters}
       />

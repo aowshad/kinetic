@@ -5,8 +5,8 @@ export const run: AnimationImpl = (el, o) => {
   // #region body
   el.style.display = 'inline-block'
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let current: Animation | null = null
-  const animateTo = (letterSpacing: string) => {
+  let current: Animation | null = null // @emit: let current = null
+  const animateTo = (letterSpacing: string) => { // @emit: const animateTo = (letterSpacing) => {
     const from = getComputedStyle(el).letterSpacing
     current?.cancel()
     current = el.animate([{ letterSpacing: from }, { letterSpacing }], {

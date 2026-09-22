@@ -6,8 +6,8 @@ export const run: AnimationImpl = (el, o) => {
   // #region body
   const split = splitChars(el)
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let anims: Animation[] = []
-  const animateTo = (transform: string) => {
+  let anims: Animation[] = [] // @emit: let anims = []
+  const animateTo = (transform: string) => { // @emit: const animateTo = (transform) => {
     const froms = split.chars.map((c) => getComputedStyle(c).transform)
     anims.forEach((a) => a.cancel())
     anims = split.chars.map((c, i) =>

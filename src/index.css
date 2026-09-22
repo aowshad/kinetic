@@ -531,6 +531,32 @@ pre,
   white-space: nowrap;
 }
 
+.k-deps-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.k-deps-badge-full {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.k-deps-badge-partial {
+  color: var(--muted);
+  border-color: var(--pill-border);
+}
+
+.k-deps-badge-none {
+  color: var(--muted);
+  border-color: var(--pill-border);
+}
+
 .k-icon-btn {
   display: inline-flex;
   align-items: center;
@@ -1341,6 +1367,21 @@ pre,
   margin: 0;
   padding: 8px 16px 0;
   font-size: 11px;
+  color: var(--muted);
+}
+
+.vanilla-note {
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-block-end: 1px solid var(--border);
+}
+
+.needs-gsap-note {
+  margin: -8px 0 8px;
+  font-size: 13px;
   color: var(--muted);
 }
 

@@ -10,8 +10,8 @@ export const run: AnimationImpl = (el, o) => {
   line.setAttribute('aria-hidden', 'true')
   el.append(line)
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let current: Animation | null = null
-  const animateTo = (scaleX: number) => {
+  let current: Animation | null = null // @emit: let current = null
+  const animateTo = (scaleX: number) => { // @emit: const animateTo = (scaleX) => {
     const from = getComputedStyle(line).transform
     current?.cancel()
     current = line.animate([{ transform: from }, { transform: `scaleX(${scaleX})` }], {

@@ -22,8 +22,8 @@ export const run: AnimationImpl = (el, o) => {
   roll.append(inner)
   el.append(roll)
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let current: Animation | null = null
-  const animateTo = (yPercent: number) => {
+  let current: Animation | null = null // @emit: let current = null
+  const animateTo = (yPercent: number) => { // @emit: const animateTo = (yPercent) => {
     const from = getComputedStyle(inner).transform
     current?.cancel()
     current = inner.animate([{ transform: from }, { transform: `translateY(${yPercent}%)` }], {

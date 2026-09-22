@@ -18,10 +18,10 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   const durationMs = o.duration * 1000
   const delayMs = o.delay * 1000
   let raf = 0
-  let start: number | null = null
+  let start: number | null = null // @emit: let start = null
   let cancelled = false
 
-  const tick = (now: number) => {
+  const tick = (now: number) => { // @emit: const tick = (now) => {
     if (cancelled) return
     if (start === null) start = now
     const elapsed = now - start - delayMs

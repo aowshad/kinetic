@@ -12,9 +12,9 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   const legs = 6
   const holdUnits = 8
   const totalUnits = legs + holdUnits
-  const keyframes: Keyframe[] = []
+  const keyframes: Keyframe[] = [] // @emit: const keyframes = []
   for (let i = 0; i <= legs; i++) {
-    const kf: Keyframe = { opacity: i % 2 === 0 ? 1 : 0.3, offset: i / totalUnits }
+    const kf: Keyframe = { opacity: i % 2 === 0 ? 1 : 0.3, offset: i / totalUnits } // @emit: const kf = { opacity: i % 2 === 0 ? 1 : 0.3, offset: i / totalUnits }
     if (i > 0) kf.easing = easing
     keyframes.push(kf)
   }

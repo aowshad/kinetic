@@ -1,4 +1,6 @@
 import type { AnimationModule, AnimationOptions, TextRole } from './types'
+import { LINEAR_EASE_MAP, EASE_POINTS } from './linearEases'
+import { SPLIT_CHARS_SOURCE, EASE_AT_SOURCE, SCROLL_SCRUB_SOURCE } from './inlineHelpers'
 
 const ROLE_TAG: Record<TextRole, string> = {
   heading: 'h2',
@@ -67,6 +69,40 @@ export function emitVanilla(module: AnimationModule, source: string, o: Animatio
   const fnName = toCamel(module.id)
   const code = `${importLines(module.plugins).join('\n')}\n${registerLine(module.plugins)}
 export function ${fnName}(el) {
+${body}
+}
+`
+  return withCss(code, css)
+}
+
+/**
+ * Emits the zero-dependency snippet from a vanilla.ts source: same
+ * #region body / @internal / @emit sentinel pipeline as emitVanilla, plus
+ * two extra passes specific to the vanilla path — substituting the
+ * precomputed literal ease (LINEAR_EASE_MAP/EASE_POINTS lookups become the
+ * actual linear() string or points array for the current ease, computed
+ * here at emit time, not read from an import in the snippet) and inlining
+ * whichever shared helpers the body actually calls. splitChars/easeAt/
+ * scrollScrub have no imports of their own, so inlining them is literally
+ * just prepending their source — no further rewriting needed.
+ */
+export function emitVanillaJS(module: AnimationModule, vanillaSource: string, o: AnimationOptions, css?: string) {
+  let body = transformBody(extractBody(vanillaSource), o)
+  body = body
+    .replace(/LINEAR_EASE_MAP\['([^']+)'\]\s*\?\?\s*'linear'/g, (_, ease: string) => `'${LINEAR_EASE_MAP[ease] ?? 'linear'}'`)
+    .replace(
+      /EASE_POINTS\['([^']+)'\]\s*\?\?\s*\[0,\s*1\]/g,
+      (_, ease: string) => `[${(EASE_POINTS[ease] ?? [0, 1]).join(', ')}]`,
+    )
+  body = indent(body, 2)
+
+  const helpers: string[] = []
+  if (vanillaSource.includes('splitChars(')) helpers.push(SPLIT_CHARS_SOURCE)
+  if (vanillaSource.includes('easeAt(')) helpers.push(EASE_AT_SOURCE)
+  if (vanillaSource.includes('scrollScrub(')) helpers.push(SCROLL_SCRUB_SOURCE)
+
+  const fnName = toCamel(module.id)
+  const code = `${helpers.map((h) => `${h}\n\n`).join('')}export function ${fnName}(el) {
 ${body}
 }
 `

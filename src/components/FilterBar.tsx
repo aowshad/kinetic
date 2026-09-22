@@ -15,6 +15,8 @@ export default function FilterBar({
   roles,
   selectedRoles,
   onToggleRole,
+  noDepsOnly,
+  onToggleNoDeps,
   onClear,
   hasActiveFilters,
 }: {
@@ -26,6 +28,8 @@ export default function FilterBar({
   roles: PillOption<TextRole>[]
   selectedRoles: TextRole[]
   onToggleRole: (r: TextRole) => void
+  noDepsOnly: boolean
+  onToggleNoDeps: () => void
   onClear: () => void
   hasActiveFilters: boolean
 }) {
@@ -84,6 +88,22 @@ export default function FilterBar({
             </div>
           </div>
           <p className="filter-help">Animations can suit more than one role.</p>
+        </div>
+
+        <div className="filter-group">
+          <div className="filter-group-row">
+            <span className="filter-group-label">Dependencies</span>
+            <div className="filter-pills" role="group" aria-label="Filter by dependency">
+              <button
+                type="button"
+                aria-pressed={noDepsOnly}
+                onClick={onToggleNoDeps}
+                className="k-pill"
+              >
+                No dependencies
+              </button>
+            </div>
+          </div>
         </div>
 
         {hasActiveFilters && (

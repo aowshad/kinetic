@@ -13,8 +13,8 @@ export const run: AnimationImpl = (el, o) => {
   el.append(fill)
   fill.style.clipPath = 'inset(0 100% 0 0)'
   const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
-  let current: Animation | null = null
-  const animateTo = (rightInset: number) => {
+  let current: Animation | null = null // @emit: let current = null
+  const animateTo = (rightInset: number) => { // @emit: const animateTo = (rightInset) => {
     const from = getComputedStyle(fill).clipPath
     current?.cancel()
     current = fill.animate([{ clipPath: from }, { clipPath: `inset(0 ${rightInset}% 0 0)` }], {

@@ -7,7 +7,7 @@ import ControlPanel, { type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
 import { useAnimation } from '../lib/useAnimation'
 import { useSampleText } from '../lib/useSampleText'
-import { emitReact, emitVanilla } from '../lib/emit'
+import { emitReact, emitVanilla, emitVanillaJS } from '../lib/emit'
 import type { AnimationOptions, TextRole } from '../lib/types'
 
 const FIT_RANGES: Record<TextRole, { min: number; max: number }> = {
@@ -49,7 +49,7 @@ function DetailView({
   prev?: (typeof catalog)[number]
   next?: (typeof catalog)[number]
 }) {
-  const { module, source, css } = entry
+  const { module, source, vanillaSource, css } = entry
   const [sampleText, setSampleText] = useSampleText()
   const [align, setAlign] = useState<Align>('center')
   const [options, setOptions] = useState<AnimationOptions>(module.defaults)
@@ -78,8 +78,9 @@ function DetailView({
     setIsPlaying,
   )
 
-  const vanilla = emitVanilla(module, source, options, css)
+  const jsGsap = emitVanilla(module, source, options, css)
   const react = emitReact(module, source, options, sampleText, css)
+  const js = vanillaSource ? emitVanillaJS(module, vanillaSource, options, css) : null
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(`${location.origin}${location.pathname}#/a/${module.id}`)
@@ -105,6 +106,21 @@ function DetailView({
           <div className="detail-title-group">
             <h1 className="detail-title">{module.name}</h1>
             <span className="k-chip">{module.category}</span>
+            {module.vanilla === 'full' && (
+              <span className="k-deps-badge k-deps-badge-full" title="Runs on the Web Animations API — no GSAP needed">
+                No deps
+              </span>
+            )}
+            {module.vanilla === 'partial' && (
+              <span className="k-deps-badge k-deps-badge-partial" title={module.vanillaNote}>
+                No deps*
+              </span>
+            )}
+            {module.vanilla === 'none' && (
+              <span className="k-deps-badge k-deps-badge-none" title={module.vanillaNote ?? 'Needs GSAP'}>
+                GSAP
+              </span>
+            )}
             {module.plugins.map((p) => (
               <span key={p} className="plugin-badge" title="Included free in GSAP 3.13+">
                 {p}
@@ -113,6 +129,9 @@ function DetailView({
           </div>
         </div>
         <p className="detail-blurb">{module.blurb}</p>
+        {module.vanilla === 'none' && (
+          <p className="needs-gsap-note">{module.vanillaNote ?? 'Needs GSAP — no zero-dependency equivalent for this animation.'}</p>
+        )}
 
         <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
           <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
@@ -161,7 +180,14 @@ function DetailView({
           onPreviewEase={setPreviewEase}
         />
 
-        <CodeTabs vanilla={vanilla} react={react} source={source} />
+        <CodeTabs
+          js={js}
+          jsGsap={jsGsap}
+          react={react}
+          source={source}
+          vanilla={module.vanilla}
+          vanillaNote={module.vanillaNote}
+        />
 
         <nav className="detail-nav">
           {prev && (

@@ -79,6 +79,21 @@ export default function AnimationCard({
               <Link to={`/a/${module.id}`}>{module.name}</Link>
             </h3>
             <p className="k-chip">{module.category}</p>
+            {module.vanilla === 'full' && (
+              <span className="k-deps-badge k-deps-badge-full" title="Runs on the Web Animations API — no GSAP needed">
+                No deps
+              </span>
+            )}
+            {module.vanilla === 'partial' && (
+              <span className="k-deps-badge k-deps-badge-partial" title={module.vanillaNote}>
+                No deps*
+              </span>
+            )}
+            {module.vanilla === 'none' && (
+              <span className="k-deps-badge k-deps-badge-none" title={module.vanillaNote ?? 'Needs GSAP'}>
+                GSAP
+              </span>
+            )}
           </div>
           <button
             type="button"

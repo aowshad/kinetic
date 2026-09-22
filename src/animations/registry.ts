@@ -6,6 +6,11 @@ const gsapSources = import.meta.glob<string>('./**/gsap.ts', {
   query: '?raw',
   import: 'default',
 })
+const vanillaSources = import.meta.glob<string>('./**/vanilla.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+})
 const styles = import.meta.glob<string>('./**/style.css', {
   eager: true,
   query: '?raw',
@@ -18,6 +23,7 @@ const catalog: CatalogEntry[] = Object.entries(modules)
     return {
       module: mod.default,
       source: gsapSources[`${dir}/gsap.ts`],
+      vanillaSource: mod.default.vanilla !== 'none' ? vanillaSources[`${dir}/vanilla.ts`] : undefined,
       css: styles[`${dir}/style.css`],
       path,
     }
