@@ -871,7 +871,12 @@ pre,
   content: "|";
   display: inline-block;
   margin-inline-start: 2px;
-  animation: k-caret-blink 1s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .k-type-caret::after {
+    animation: k-caret-blink 1s steps(1) infinite;
+  }
 }
 
 @keyframes k-caret-blink {

@@ -7,7 +7,7 @@ const decodeMatrix: AnimationModule = {
   roles: ['heading', 'label', 'button'], tags: ['scramble', 'mono'],
   blurb: 'Each character decodes from scrambled noise, one after another.',
   defaults: { duration: 0.4, stagger: 0.05, delay: 0, ease: 'none' },
-  plugins: ['ScrambleTextPlugin'],
+  plugins: ['ScrambleTextPlugin', 'SplitText'],
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }
