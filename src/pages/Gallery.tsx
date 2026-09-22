@@ -8,11 +8,10 @@ import SampleTextHero from '../components/SampleTextHero'
 import ThemeControl from '../components/ThemeControl'
 import { useSampleText } from '../lib/useSampleText'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
-import type { Category, TextRole } from '../lib/types'
+import type { Category } from '../lib/types'
 import type { ThemeMode } from '../lib/useTheme'
 
 const CATEGORY_ORDER: Category[] = ['entrance', 'kinetic', 'scroll', 'hover', 'loop', 'exit']
-const ROLE_ORDER: TextRole[] = ['heading', 'paragraph', 'button', 'link', 'label', 'counter']
 const GSAP_VERSION = (pkg.dependencies.gsap as string).replace(/^[^0-9]*/, '')
 
 export default function Gallery({
@@ -27,8 +26,6 @@ export default function Gallery({
   const [inputValue, setInputValue] = useState(sampleText)
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
-  const [selectedRoles, setSelectedRoles] = useState<TextRole[]>([])
-  const [noDepsOnly, setNoDepsOnly] = useState(false)
   const [installCopied, setInstallCopied] = useState(false)
 
   useEffect(() => {
@@ -48,50 +45,25 @@ export default function Gallery({
     () => CATEGORY_ORDER.filter((c) => catalog.some((e) => e.module.category === c)),
     [],
   )
-  const presentRoles = useMemo(
-    () => ROLE_ORDER.filter((r) => catalog.some((e) => e.module.roles.includes(r))),
-    [],
-  )
 
   const categoryCounts = presentCategories.map((value) => ({
     value,
-    count: searchFiltered.filter(
-      (e) =>
-        e.module.category === value &&
-        (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))),
-    ).length,
-  }))
-
-  const roleCounts = presentRoles.map((value) => ({
-    value,
-    count: searchFiltered.filter(
-      (e) =>
-        e.module.roles.includes(value) &&
-        (selectedCategories.length === 0 || selectedCategories.includes(e.module.category)),
-    ).length,
+    count: searchFiltered.filter((e) => e.module.category === value).length,
   }))
 
   const filtered = searchFiltered.filter(
-    (e) =>
-      (selectedCategories.length === 0 || selectedCategories.includes(e.module.category)) &&
-      (selectedRoles.length === 0 || e.module.roles.some((r) => selectedRoles.includes(r))) &&
-      (!noDepsOnly || e.module.vanilla !== 'none'),
+    (e) => selectedCategories.length === 0 || selectedCategories.includes(e.module.category),
   )
 
-  const hasActiveFilters =
-    search.length > 0 || selectedCategories.length > 0 || selectedRoles.length > 0 || noDepsOnly
+  const hasActiveFilters = search.length > 0 || selectedCategories.length > 0
 
   const clearFilters = () => {
     setSearch('')
     setSelectedCategories([])
-    setSelectedRoles([])
-    setNoDepsOnly(false)
   }
 
   const toggleCategory = (c: Category) =>
     setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]))
-  const toggleRole = (r: TextRole) =>
-    setSelectedRoles((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]))
 
   const groups = presentCategories
     .map((category) => ({ category, entries: filtered.filter((e) => e.module.category === category) }))
@@ -152,11 +124,6 @@ export default function Gallery({
         categories={categoryCounts}
         selectedCategories={selectedCategories}
         onToggleCategory={toggleCategory}
-        roles={roleCounts}
-        selectedRoles={selectedRoles}
-        onToggleRole={toggleRole}
-        noDepsOnly={noDepsOnly}
-        onToggleNoDeps={() => setNoDepsOnly((v) => !v)}
         onClear={clearFilters}
         hasActiveFilters={hasActiveFilters}
       />
