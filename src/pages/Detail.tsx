@@ -9,6 +9,7 @@ import EngineControl from '../components/EngineControl'
 import { useAnimation } from '../lib/useAnimation'
 import { useSampleText } from '../lib/useSampleText'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
+import { usePrefersReducedMotion } from '../lib/usePrefersReducedMotion'
 import { emitReact, emitVanilla, emitVanillaJS } from '../lib/emit'
 import type { AnimationOptions, TextRole } from '../lib/types'
 
@@ -63,6 +64,8 @@ function DetailView({
   const isScroll = module.category === 'scroll'
   const [isPlaying, setIsPlaying] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const loopBlocked = prefersReducedMotion && (module.category === 'loop' || module.tags.includes('loop'))
 
   useEffect(() => {
     if (!autoLoop) return
@@ -156,19 +159,21 @@ function DetailView({
               <>
                 <button
                   type="button"
-                  disabled={isPlaying}
-                  aria-label={`Play ${module.name} animation`}
+                  disabled={isPlaying || loopBlocked}
+                  aria-label={loopBlocked ? 'Replay disabled — reduced motion is on' : `Play ${module.name} animation`}
+                  title={loopBlocked ? 'This loops forever, so replay stays off while reduced motion is on' : undefined}
                   onClick={() => setReplayKey((k) => k + 1)}
                   className="k-play-btn"
                 >
                   <Play size={14} />
-                  {isPlaying ? 'Playing…' : 'Play'}
+                  {loopBlocked ? 'Reduced motion' : isPlaying ? 'Playing…' : 'Play'}
                 </button>
                 <button
                   type="button"
+                  disabled={loopBlocked}
                   aria-pressed={autoLoop}
-                  aria-label="Loop playback every 1.2s"
-                  title="Loop playback every 1.2s"
+                  aria-label={loopBlocked ? 'Loop playback disabled — reduced motion is on' : 'Loop playback every 1.2s'}
+                  title={loopBlocked ? 'Reduced motion is on' : 'Loop playback every 1.2s'}
                   onClick={() => setAutoLoop((v) => !v)}
                   className="k-play-btn"
                 >

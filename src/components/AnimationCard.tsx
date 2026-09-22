@@ -5,6 +5,7 @@ import Stage from './Stage'
 import CodeBlock from './CodeBlock'
 import { useAnimation } from '../lib/useAnimation'
 import { useInView } from '../lib/useInView'
+import { usePrefersReducedMotion } from '../lib/usePrefersReducedMotion'
 import type { Engine } from '../lib/usePreviewEngine'
 import type { CatalogEntry, TextRole } from '../lib/types'
 
@@ -38,6 +39,8 @@ export default function AnimationCard({
   const { ref: cardRef, inView } = useInView<HTMLElement>('100% 0px')
   const isHover = module.category === 'hover'
   const isScroll = module.category === 'scroll'
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const loopBlocked = prefersReducedMotion && (isLoop || module.tags.includes('loop'))
   const active = isLoop ? inView && isPlaying : inView
   const stageKey = `${sampleText}::${replayKey}`
   const ref = useAnimation<HTMLElement>(
@@ -118,24 +121,27 @@ export default function AnimationCard({
           ) : isLoop ? (
             <button
               type="button"
+              disabled={loopBlocked}
               aria-pressed={isPlaying}
-              aria-label={`${isPlaying ? 'Pause' : 'Play'} ${module.name} animation`}
+              aria-label={loopBlocked ? 'Playback disabled — reduced motion is on' : `${isPlaying ? 'Pause' : 'Play'} ${module.name} animation`}
+              title={loopBlocked ? 'This loops forever, so it stays off while reduced motion is on' : undefined}
               onClick={() => setIsPlaying((v) => !v)}
               className="k-play-btn"
             >
               {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-              {isPlaying ? 'Pause' : 'Play'}
+              {loopBlocked ? 'Reduced motion' : isPlaying ? 'Pause' : 'Play'}
             </button>
           ) : (
             <button
               type="button"
-              disabled={isPlaying}
-              aria-label={`Play ${module.name} animation`}
+              disabled={isPlaying || loopBlocked}
+              aria-label={loopBlocked ? 'Replay disabled — reduced motion is on' : `Play ${module.name} animation`}
+              title={loopBlocked ? 'This loops forever, so replay stays off while reduced motion is on' : undefined}
               onClick={replay}
               className="k-play-btn"
             >
               <Play size={14} />
-              {isPlaying ? 'Playing…' : 'Play'}
+              {loopBlocked ? 'Reduced motion' : isPlaying ? 'Playing…' : 'Play'}
             </button>
           )}
           <button type="button" aria-expanded={showCode} onClick={toggleCode} className="k-ghost-btn">

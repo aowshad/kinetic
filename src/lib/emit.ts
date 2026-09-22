@@ -69,6 +69,8 @@ export function emitVanilla(module: AnimationModule, source: string, o: Animatio
   const fnName = toCamel(module.id)
   const code = `${importLines(module.plugins).join('\n')}\n${registerLine(module.plugins)}
 export function ${fnName}(el) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
+
 ${body}
 }
 `
@@ -135,6 +137,7 @@ export default function ${componentName}({ text = ${JSON.stringify(sampleText)} 
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
 ${body}
     }, ref)
