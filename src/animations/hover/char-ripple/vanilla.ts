@@ -1,1 +1,42 @@
-// Phase 2: zero-dependency Web Animations API implementation — not yet written.
+import { splitChars } from '../../../lib/splitChars'
+import { LINEAR_EASE_MAP } from '../../../lib/linearEases'
+import type { AnimationImpl } from '../../../lib/types'
+
+export const run: AnimationImpl = (el, o) => {
+  // #region body
+  const split = splitChars(el)
+  const easing = LINEAR_EASE_MAP[o.ease] ?? 'linear'
+  let anims: Animation[] = []
+  const enter = () => {
+    anims.forEach((a) => a.cancel())
+    anims = split.chars.map((c, i) =>
+      c.animate([{ transform: 'none' }, { transform: 'translateY(-8px)' }], {
+        duration: o.duration * 1000,
+        delay: i * o.stagger * 1000,
+        easing,
+        iterations: Infinity,
+        direction: 'alternate',
+        fill: 'backwards',
+      }),
+    )
+  }
+  const leave = () => {
+    const froms = split.chars.map((c) => getComputedStyle(c).transform)
+    anims.forEach((a) => a.cancel())
+    anims = split.chars.map((c, i) =>
+      c.animate([{ transform: froms[i] }, { transform: 'none' }], {
+        duration: o.duration * 1000,
+        easing,
+        fill: 'forwards',
+      }),
+    )
+  }
+  const ons = [['pointerenter', enter], ['pointerleave', leave], ['focus', enter], ['blur', leave]] as const
+  ons.forEach(([e, fn]) => el.addEventListener(e, fn))
+  return () => {
+    anims.forEach((a) => a.cancel())
+    ons.forEach(([e, fn]) => el.removeEventListener(e, fn))
+    split.revert()
+  }
+  // #endregion body
+}
