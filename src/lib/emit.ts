@@ -85,6 +85,12 @@ ${body}
  * whichever shared helpers the body actually calls. splitChars/easeAt/
  * scrollScrub have no imports of their own, so inlining them is literally
  * just prepending their source — no further rewriting needed.
+ *
+ * Also injects a `prefers-reduced-motion` guard as the function's first
+ * line: reduced-motion users get the element's untouched static markup
+ * (every implementation's default DOM/CSS state is the fully visible end
+ * state — nothing here relies on JS to reveal hidden content) instead of
+ * the motion effect.
  */
 export function emitVanillaJS(module: AnimationModule, vanillaSource: string, o: AnimationOptions, css?: string) {
   let body = transformBody(extractBody(vanillaSource), o)
@@ -103,6 +109,8 @@ export function emitVanillaJS(module: AnimationModule, vanillaSource: string, o:
 
   const fnName = toCamel(module.id)
   const code = `${helpers.map((h) => `${h}\n\n`).join('')}export function ${fnName}(el) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
+
 ${body}
 }
 `
