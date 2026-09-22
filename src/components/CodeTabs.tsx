@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import type { VanillaTier } from '../lib/types'
+import type { Engine } from '../lib/usePreviewEngine'
 
 type Tab = 'js' | 'jsGsap' | 'react' | 'source'
 
@@ -13,6 +14,8 @@ export default function CodeTabs({
   source,
   vanilla,
   vanillaNote,
+  engine,
+  onEngineChange,
 }: {
   js: string | null
   jsGsap: string
@@ -20,11 +23,27 @@ export default function CodeTabs({
   source: string
   vanilla: VanillaTier
   vanillaNote?: string
+  engine: Engine
+  onEngineChange: (e: Engine) => void
 }) {
   const tabs: Tab[] = js !== null ? ['js', 'jsGsap', 'react', 'source'] : ['jsGsap', 'react', 'source']
-  const [tab, setTab] = useState<Tab>(js !== null ? 'js' : 'jsGsap')
+  const [tab, setTab] = useState<Tab>(js !== null && engine === 'vanilla' ? 'js' : 'jsGsap')
   const [copied, setCopied] = useState(false)
   const code = tab === 'js' ? (js ?? '') : tab === 'jsGsap' ? jsGsap : tab === 'react' ? react : source
+
+  // Engine changed elsewhere (e.g. the control-bar toggle) while a JS/JS+GSAP
+  // tab was open — follow it so the tab and the running preview never disagree.
+  useEffect(() => {
+    if (tab === 'js' && engine === 'gsap') setTab('jsGsap')
+    else if (tab === 'jsGsap' && engine === 'vanilla' && js !== null) setTab('js')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine])
+
+  const selectTab = (t: Tab) => {
+    setTab(t)
+    if (t === 'js') onEngineChange('vanilla')
+    if (t === 'jsGsap') onEngineChange('gsap')
+  }
 
   const copy = async () => {
     await navigator.clipboard.writeText(code)
@@ -42,7 +61,7 @@ export default function CodeTabs({
               type="button"
               role="tab"
               aria-selected={tab === t}
-              onClick={() => setTab(t)}
+              onClick={() => selectTab(t)}
               className="detail-tab-btn"
             >
               {LABELS[t]}

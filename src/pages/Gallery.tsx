@@ -6,7 +6,9 @@ import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
 import SampleTextHero from '../components/SampleTextHero'
 import ThemeControl from '../components/ThemeControl'
+import EngineControl from '../components/EngineControl'
 import { useSampleText } from '../lib/useSampleText'
+import { usePreviewEngine } from '../lib/usePreviewEngine'
 import type { Category, TextRole } from '../lib/types'
 import type { ThemeMode } from '../lib/useTheme'
 
@@ -22,6 +24,7 @@ export default function Gallery({
   onThemeToggle: (m: ThemeMode) => void
 }) {
   const [sampleText, setSampleText] = useSampleText()
+  const [engine, setEngine] = usePreviewEngine()
   const [inputValue, setInputValue] = useState(sampleText)
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
@@ -122,7 +125,10 @@ export default function Gallery({
               on older browsers. We tell you which is which.
             </p>
           </div>
-          <ThemeControl mode={theme} onChange={onThemeToggle} />
+          <div className="page-header-controls">
+            <EngineControl engine={engine} onChange={setEngine} />
+            <ThemeControl mode={theme} onChange={onThemeToggle} />
+          </div>
         </div>
         <div className="page-header-badges">
           <button type="button" onClick={copyInstall} className="badge-btn">
@@ -178,7 +184,7 @@ export default function Gallery({
               {category} <span>· {entries.length}</span>
             </h2>
             {entries.map((entry) => (
-              <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} />
+              <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} engine={engine} />
             ))}
           </div>
         ))}

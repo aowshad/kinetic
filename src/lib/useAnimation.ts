@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fitText } from './fitText'
+import type { Engine } from './usePreviewEngine'
 import type { AnimationModule, AnimationOptions } from './types'
 
 interface FitRange {
@@ -13,6 +14,7 @@ export function useAnimation<T extends HTMLElement>(
   active: boolean,
   playKey: string,
   fitRange: FitRange,
+  engine: Engine,
   onPlaying?: (playing: boolean) => void,
 ) {
   const ref = useRef<T>(null)
@@ -43,8 +45,9 @@ export function useAnimation<T extends HTMLElement>(
     document.fonts.ready.then(() => {
       if (cancelled) return
       fitText(el, box, { ...fitRange, safety: module.fitSafety ?? 1 })
+      const impl = engine === 'vanilla' && module.impl.vanilla ? module.impl.vanilla : module.impl.gsap
       onPlaying?.(true)
-      cleanup = module.impl.gsap(el, options, () => onPlaying?.(false))
+      cleanup = impl(el, options, () => onPlaying?.(false))
     })
 
     return () => {
@@ -52,7 +55,7 @@ export function useAnimation<T extends HTMLElement>(
       cleanup?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, playKey, resizeTick])
+  }, [active, playKey, resizeTick, engine])
 
   return ref
 }

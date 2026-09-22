@@ -5,8 +5,10 @@ import catalog from '../animations/registry'
 import Stage from '../components/Stage'
 import ControlPanel, { type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
+import EngineControl from '../components/EngineControl'
 import { useAnimation } from '../lib/useAnimation'
 import { useSampleText } from '../lib/useSampleText'
+import { usePreviewEngine } from '../lib/usePreviewEngine'
 import { emitReact, emitVanilla, emitVanillaJS } from '../lib/emit'
 import type { AnimationOptions, TextRole } from '../lib/types'
 
@@ -51,6 +53,7 @@ function DetailView({
 }) {
   const { module, source, vanillaSource, css } = entry
   const [sampleText, setSampleText] = useSampleText()
+  const [engine, setEngine] = usePreviewEngine()
   const [align, setAlign] = useState<Align>('center')
   const [options, setOptions] = useState<AnimationOptions>(module.defaults)
   const [previewEase, setPreviewEase] = useState<string | null>(null)
@@ -75,6 +78,7 @@ function DetailView({
     true,
     stageKey,
     FIT_RANGES[module.roles[0]],
+    engine,
     setIsPlaying,
   )
 
@@ -136,36 +140,44 @@ function DetailView({
         <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
           <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
         </div>
+        {engine === 'vanilla' && module.vanilla === 'partial' && module.vanillaNote && (
+          <p className="stage-note">{module.vanillaNote}</p>
+        )}
         <div className="stage-toolbar">
-          {isHover ? (
-            <span className="k-hint">Hover the text</span>
-          ) : isScroll ? (
-            <span className="k-hint">Scroll the page</span>
-          ) : (
-            <>
-              <button
-                type="button"
-                disabled={isPlaying}
-                aria-label={`Play ${module.name} animation`}
-                onClick={() => setReplayKey((k) => k + 1)}
-                className="k-play-btn"
-              >
-                <Play size={14} />
-                {isPlaying ? 'Playing…' : 'Play'}
-              </button>
-              <button
-                type="button"
-                aria-pressed={autoLoop}
-                aria-label="Loop playback every 1.2s"
-                title="Loop playback every 1.2s"
-                onClick={() => setAutoLoop((v) => !v)}
-                className="k-play-btn"
-              >
-                <Repeat size={14} />
-                Loop
-              </button>
-            </>
-          )}
+          <div className="stage-toolbar-left">
+            {module.vanilla !== 'none' && <EngineControl engine={engine} onChange={setEngine} />}
+          </div>
+          <div className="stage-toolbar-right">
+            {isHover ? (
+              <span className="k-hint">Hover the text</span>
+            ) : isScroll ? (
+              <span className="k-hint">Scroll the page</span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={isPlaying}
+                  aria-label={`Play ${module.name} animation`}
+                  onClick={() => setReplayKey((k) => k + 1)}
+                  className="k-play-btn"
+                >
+                  <Play size={14} />
+                  {isPlaying ? 'Playing…' : 'Play'}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={autoLoop}
+                  aria-label="Loop playback every 1.2s"
+                  title="Loop playback every 1.2s"
+                  onClick={() => setAutoLoop((v) => !v)}
+                  className="k-play-btn"
+                >
+                  <Repeat size={14} />
+                  Loop
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         <ControlPanel
@@ -187,6 +199,8 @@ function DetailView({
           source={source}
           vanilla={module.vanilla}
           vanillaNote={module.vanillaNote}
+          engine={engine}
+          onEngineChange={setEngine}
         />
 
         <nav className="detail-nav">

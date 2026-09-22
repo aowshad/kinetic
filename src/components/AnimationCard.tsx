@@ -5,6 +5,7 @@ import Stage from './Stage'
 import CodeBlock from './CodeBlock'
 import { useAnimation } from '../lib/useAnimation'
 import { useInView } from '../lib/useInView'
+import type { Engine } from '../lib/usePreviewEngine'
 import type { CatalogEntry, TextRole } from '../lib/types'
 
 const FIT_RANGES: Record<TextRole, { min: number; max: number }> = {
@@ -19,9 +20,11 @@ const FIT_RANGES: Record<TextRole, { min: number; max: number }> = {
 export default function AnimationCard({
   entry,
   sampleText,
+  engine,
 }: {
   entry: CatalogEntry
   sampleText: string
+  engine: Engine
 }) {
   const { module, source } = entry
   const [replayKey, setReplayKey] = useState(0)
@@ -43,6 +46,7 @@ export default function AnimationCard({
     active,
     stageKey,
     FIT_RANGES[module.roles[0]],
+    engine,
     isLoop ? undefined : setIsPlaying,
   )
 
@@ -150,6 +154,9 @@ export default function AnimationCard({
         <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
         {showHint && <span className="stage-hint">Click to replay</span>}
       </div>
+      {engine === 'vanilla' && module.vanilla === 'partial' && module.vanillaNote && (
+        <p className="stage-note">{module.vanillaNote}</p>
+      )}
       <div className="drawer" data-open={showCode}>
         <div className="drawer-inner">{openedOnce && <CodeBlock code={source} />}</div>
       </div>
