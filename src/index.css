@@ -543,7 +543,6 @@ pre,
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  margin-block-start: auto;
   padding-block-start: 16px;
 }
 
@@ -661,6 +660,14 @@ pre,
   pointer-events: none;
 }
 
+.stage-hint-scroll {
+  transition: opacity 300ms ease;
+}
+
+.stage-hint-scroll[data-faded='true'] {
+  opacity: 0;
+}
+
 .stage-paragraph {
   max-inline-size: 60ch;
 }
@@ -682,9 +689,11 @@ pre,
   display: flex;
   flex-direction: column;
   align-items: center;
+  inline-size: 100%;
   block-size: 280px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding-inline: 32px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-hover) transparent;

@@ -36,6 +36,7 @@ export default function AnimationCard({
   const [openedOnce, setOpenedOnce] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const [scrolledDemo, setScrolledDemo] = useState(false)
   const hintSeenRef = useRef(false)
   const isLoop = module.category === 'loop'
   const [isPlaying, setIsPlaying] = useState(isLoop)
@@ -118,9 +119,7 @@ export default function AnimationCard({
         <div className="k-card-actions">
           {isHover ? (
             <span className="k-hint">Hover the text</span>
-          ) : isScroll ? (
-            <span className="k-hint">Scroll inside this box</span>
-          ) : isLoop ? (
+          ) : isScroll ? null : isLoop ? (
             <button
               type="button"
               disabled={loopBlocked}
@@ -156,12 +155,20 @@ export default function AnimationCard({
       </div>
       {isScroll ? (
         <div className="stage stage-scroll">
-          <div className="scroll-demo-track" data-scroll-demo>
+          <div
+            className="scroll-demo-track"
+            data-scroll-demo
+            onScroll={() => {
+              if (!scrolledDemo) setScrolledDemo(true)
+            }}
+          >
             <div className="scroll-demo-pad" aria-hidden="true" />
             <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
             <div className="scroll-demo-pad" aria-hidden="true" />
           </div>
-          <span className="stage-hint">Scroll inside this box</span>
+          <span className="stage-hint stage-hint-scroll" data-faded={scrolledDemo}>
+            Scroll inside this box
+          </span>
         </div>
       ) : (
         <div
