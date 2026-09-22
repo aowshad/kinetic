@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const bounceLoop: AnimationModule = {
   id: 'bounce-loop', name: 'Bounce Loop', category: 'loop',
@@ -7,8 +8,8 @@ const bounceLoop: AnimationModule = {
   blurb: 'Text bounces up and down endlessly, like a ball at rest.',
   defaults: { duration: 0.6, stagger: 0, delay: 0, ease: 'bounce.out' },
   plugins: [],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default bounceLoop

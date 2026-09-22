@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const loadingUnderline: AnimationModule = {
   id: 'loading-underline', name: 'Loading Underline', category: 'loop',
@@ -7,8 +8,8 @@ const loadingUnderline: AnimationModule = {
   blurb: 'An accent bar sweeps back and forth beneath the text forever.',
   defaults: { duration: 1.2, stagger: 0, delay: 0, ease: 'sine.inOut' },
   plugins: [],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default loadingUnderline

@@ -14,7 +14,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
       fill: 'backwards',
     }),
   )
-  Promise.all(anims.map((a) => a.finished)).then(() => onComplete?.()) // @internal
+  Promise.all(anims.map((a) => a.finished)).then(() => onComplete?.()).catch(() => {}) // @internal
   return () => {
     anims.forEach((a) => a.cancel())
     split.revert()
