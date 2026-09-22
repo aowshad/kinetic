@@ -7,7 +7,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()
   const split = new SplitText(el, { type: 'words', wordsClass: 'k-word' })
   const tl = gsap.timeline({
-    scrollTrigger: { trigger: el, start: 'top 85%', end: 'top 25%', scrub: true },
+    scrollTrigger: { trigger: el, scroller: el.closest('[data-scroll-demo]') || undefined, start: 'top 85%', end: 'top 25%', scrub: true },
   })
   tl.to(split.words, { color: accent, duration: o.duration, stagger: o.stagger, ease: o.ease })
   onComplete?.() // @internal

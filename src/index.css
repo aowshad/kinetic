@@ -669,6 +669,40 @@ pre,
   font-variant-numeric: tabular-nums;
 }
 
+/* Scroll animations are scrubbed to scroll position — real page scroll
+   doesn't reliably pass through a fixed-height gallery card, so it gets its
+   own small internal scroll container instead (scrollScrub/ScrollTrigger
+   both bind to it via a [data-scroll-demo] lookup, not the page). */
+.stage-scroll {
+  display: block;
+  padding: 0;
+}
+
+.scroll-demo-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  block-size: 280px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline: 32px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hover) transparent;
+}
+
+.scroll-demo-track > :not(.scroll-demo-pad) {
+  flex-shrink: 0;
+  max-inline-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  text-align: center;
+}
+
+.scroll-demo-pad {
+  flex-shrink: 0;
+  block-size: 180px;
+}
+
 /* ---------- split text ---------- */
 
 .k-word {
@@ -983,15 +1017,6 @@ pre,
   border-block-start: none;
   border-radius: 0 0 12px 12px;
   background: var(--surface);
-}
-
-.stage-note {
-  margin: 0;
-  padding: 8px 16px;
-  font-size: 12px;
-  color: var(--text);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border-inline: 1px solid var(--border);
 }
 
 .detail-nav {
@@ -1400,8 +1425,8 @@ pre,
   margin: 0;
   padding: 8px 16px;
   font-size: 12px;
-  color: var(--text);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--muted);
+  background: var(--surface);
   border-block-end: 1px solid var(--border);
 }
 

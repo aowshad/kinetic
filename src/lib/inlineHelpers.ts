@@ -59,7 +59,8 @@ export const EASE_AT_SOURCE = `function easeAt(points, t) {
 }`
 
 export const SCROLL_SCRUB_SOURCE = `function scrollScrub(target, keyframes, options, subject, startVh, endVh, windowStart = 0, windowEnd = 100) {
-  const vh = window.innerHeight || document.documentElement.clientHeight
+  const container = subject.closest('[data-scroll-demo]')
+  const vh = (container ? container.clientHeight : window.innerHeight) || document.documentElement.clientHeight
   const h = subject.getBoundingClientRect().height || 1
   const coverAt = (vhFraction) => Math.min(100, Math.max(0, (((1 - vhFraction) * vh) / (vh + h)) * 100))
   const coverStart = coverAt(startVh)
@@ -85,11 +86,14 @@ export const SCROLL_SCRUB_SOURCE = `function scrollScrub(target, keyframes, opti
   const anim = target.animate(keyframes, { ...options, duration: 1000, fill: 'both' })
   anim.pause()
   const update = (rect) => {
-    const rawPercent = ((vh - rect.top) / (vh + rect.height)) * 100
+    const containerTop = container ? container.getBoundingClientRect().top : 0
+    const relativeTop = rect.top - containerTop
+    const rawPercent = ((vh - relativeTop) / (vh + rect.height)) * 100
     const windowed = (rawPercent - rangeStartPercent) / (rangeEndPercent - rangeStartPercent)
     anim.currentTime = Math.min(1, Math.max(0, windowed)) * 1000
   }
   const observer = new IntersectionObserver(([entry]) => update(entry.boundingClientRect), {
+    root: container,
     threshold: Array.from({ length: 41 }, (_, i) => i / 40),
   })
   observer.observe(subject)

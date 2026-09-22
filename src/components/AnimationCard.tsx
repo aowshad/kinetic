@@ -119,7 +119,7 @@ export default function AnimationCard({
           {isHover ? (
             <span className="k-hint">Hover the text</span>
           ) : isScroll ? (
-            <span className="k-hint">Scroll the page</span>
+            <span className="k-hint">Scroll inside this box</span>
           ) : isLoop ? (
             <button
               type="button"
@@ -154,16 +154,24 @@ export default function AnimationCard({
           </Link>
         </div>
       </div>
-      <div
-        className={isHover || isScroll ? 'stage' : 'stage stage-clickable'}
-        onClick={isHover || isScroll ? undefined : replay}
-        onMouseEnter={isHover || isScroll ? undefined : onStageMouseEnter}
-      >
-        <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
-        {showHint && <span className="stage-hint">Click to replay</span>}
-      </div>
-      {engine === 'vanilla' && module.vanilla === 'partial' && module.vanillaNote && (
-        <p className="stage-note">{module.vanillaNote}</p>
+      {isScroll ? (
+        <div className="stage stage-scroll">
+          <div className="scroll-demo-track" data-scroll-demo>
+            <div className="scroll-demo-pad" aria-hidden="true" />
+            <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+            <div className="scroll-demo-pad" aria-hidden="true" />
+          </div>
+          <span className="stage-hint">Scroll inside this box</span>
+        </div>
+      ) : (
+        <div
+          className={isHover ? 'stage' : 'stage stage-clickable'}
+          onClick={isHover ? undefined : replay}
+          onMouseEnter={isHover ? undefined : onStageMouseEnter}
+        >
+          <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+          {showHint && <span className="stage-hint">Click to replay</span>}
+        </div>
       )}
       <div className="drawer" data-open={showCode}>
         <div className="drawer-inner">

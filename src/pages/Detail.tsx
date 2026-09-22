@@ -145,9 +145,6 @@ function DetailView({
         <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
           <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
         </div>
-        {engine === 'vanilla' && module.vanilla === 'partial' && module.vanillaNote && (
-          <p className="stage-note">{module.vanillaNote}</p>
-        )}
         <div className="stage-toolbar">
           {isHover ? (
             <span className="k-hint">Hover the text</span>

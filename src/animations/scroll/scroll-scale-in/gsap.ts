@@ -5,7 +5,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   // #region body
   gsap.set(el, { scale: 0.6, transformOrigin: '50% 50%' })
   const tl = gsap.timeline({
-    scrollTrigger: { trigger: el, start: 'top 85%', end: 'top 30%', scrub: true },
+    scrollTrigger: { trigger: el, scroller: el.closest('[data-scroll-demo]') || undefined, start: 'top 85%', end: 'top 30%', scrub: true },
   })
   tl.to(el, { scale: 1, duration: o.duration, ease: o.ease })
   onComplete?.() // @internal

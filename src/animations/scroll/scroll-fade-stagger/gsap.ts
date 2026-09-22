@@ -7,7 +7,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   const split = new SplitText(el, { type: 'words,chars', wordsClass: 'k-word', charsClass: 'k-char' })
   split.words.forEach((w) => w.setAttribute('aria-hidden', 'true'))
   const tl = gsap.timeline({
-    scrollTrigger: { trigger: el, start: 'top 85%', end: 'top 25%', scrub: true },
+    scrollTrigger: { trigger: el, scroller: el.closest('[data-scroll-demo]') || undefined, start: 'top 85%', end: 'top 25%', scrub: true },
   })
   tl.from(split.chars, { yPercent: 120, opacity: 0, duration: o.duration, stagger: o.stagger, ease: o.ease })
   onComplete?.() // @internal

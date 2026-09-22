@@ -26,6 +26,14 @@
  * yet implemented when used with Scroll Timelines"), so per-character
  * staggering happens by shifting *where in the scroll range* each
  * character's own window sits, not by ms.
+ *
+ * A `[data-scroll-demo]` ancestor means this is running inside the
+ * gallery's own scoped demo box, not a real page — cards can't be scrubbed
+ * against actual page scroll, so every measurement below (the "viewport"
+ * height, and — for the IntersectionObserver fallback — the subject's
+ * position) uses that box instead of the real one. Every other caller,
+ * including a copy-pasted snippet on someone else's site, has no such
+ * ancestor and gets the real page-scroll behavior this is actually for.
  */
 export function scrollScrub(
   target: Element,
@@ -37,7 +45,8 @@ export function scrollScrub(
   windowStart = 0,
   windowEnd = 100,
 ): () => void {
-  const vh = window.innerHeight || document.documentElement.clientHeight
+  const container = subject.closest('[data-scroll-demo]') as HTMLElement | null
+  const vh = (container ? container.clientHeight : window.innerHeight) || document.documentElement.clientHeight
   const h = subject.getBoundingClientRect().height || 1
   // "cover" progress at the moment subject.top === vhFraction * vh, clamped
   // to the range's actual 0–100 bounds (a caller can pass an extreme endVh
@@ -67,11 +76,17 @@ export function scrollScrub(
   const anim = target.animate(keyframes, { ...options, duration: 1000, fill: 'both' })
   anim.pause()
   const update = (rect: DOMRectReadOnly) => {
-    const rawPercent = ((vh - rect.top) / (vh + rect.height)) * 100
+    // boundingClientRect is always viewport-relative, regardless of root —
+    // subtract the container's own top so "top" means "top of the demo box"
+    // instead of "top of the browser window" when one is in play.
+    const containerTop = container ? container.getBoundingClientRect().top : 0
+    const relativeTop = rect.top - containerTop
+    const rawPercent = ((vh - relativeTop) / (vh + rect.height)) * 100
     const windowed = (rawPercent - rangeStartPercent) / (rangeEndPercent - rangeStartPercent)
     anim.currentTime = Math.min(1, Math.max(0, windowed)) * 1000
   }
   const observer = new IntersectionObserver(([entry]) => update(entry.boundingClientRect), {
+    root: container,
     threshold: Array.from({ length: 41 }, (_, i) => i / 40),
   })
   observer.observe(subject)

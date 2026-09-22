@@ -10,7 +10,7 @@ const scrollRotateIn: AnimationModule = {
   plugins: ['SplitText', 'ScrollTrigger'],
   reducedMotion: 'skip', // scroll-position-driven, not duration-driven — nothing to settle toward
   vanilla: 'partial',
-  vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
+  vanillaNote: 'No scrub smoothing in Safari before 26 — falls back to IntersectionObserver.',
   impl: { gsap: run, vanilla: vanillaRun },
 }
 

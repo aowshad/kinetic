@@ -6,7 +6,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
   el.setAttribute('aria-label', el.textContent ?? '')
   const split = new SplitText(el, { type: 'chars', charsClass: 'k-char' })
   const tl = gsap.timeline({
-    scrollTrigger: { trigger: el, start: 'top 85%', end: 'top 25%', scrub: true },
+    scrollTrigger: { trigger: el, scroller: el.closest('[data-scroll-demo]') || undefined, start: 'top 85%', end: 'top 25%', scrub: true },
   })
   tl.from(split.chars, { rotation: 40, yPercent: 60, opacity: 0, duration: o.duration, stagger: o.stagger, ease: o.ease })
   onComplete?.() // @internal
