@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const neonFlicker: AnimationModule = {
   id: 'neon-flicker', name: 'Neon Flicker', category: 'kinetic',
@@ -7,8 +8,8 @@ const neonFlicker: AnimationModule = {
   blurb: 'Text glows like a neon sign, flickering unevenly before it settles.',
   defaults: { duration: 0.1, stagger: 0, delay: 0, ease: 'steps(1)' },
   plugins: [],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default neonFlicker

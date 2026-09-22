@@ -37,3 +37,16 @@ export const LINEAR_EASE_MAP: Record<string, string> = {
   'steps(1)': 'steps(1)',
   'steps(6)': 'steps(6)',
 }
+
+/**
+ * The same curves as numeric sample arrays instead of linear() strings, for
+ * animations that drive a plain JS value (a counter, a character count) and
+ * so can't hand the curve to Element.animate() at all — see easeAt().
+ * Derived from LINEAR_EASE_MAP so the two never drift apart.
+ */
+export const EASE_POINTS: Record<string, number[]> = Object.fromEntries(
+  Object.entries(LINEAR_EASE_MAP).map(([name, css]) => [
+    name,
+    css.startsWith('linear(') ? css.slice(7, -1).split(',').map(Number) : [0, 1],
+  ]),
+)

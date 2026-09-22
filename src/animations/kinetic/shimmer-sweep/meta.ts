@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const shimmerSweep: AnimationModule = {
   id: 'shimmer-sweep', name: 'Shimmer Sweep', category: 'kinetic',
@@ -7,8 +8,8 @@ const shimmerSweep: AnimationModule = {
   blurb: 'A soft band of light sweeps across the text on an endless loop.',
   defaults: { duration: 2, stagger: 0, delay: 0, ease: 'none' },
   plugins: [],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default shimmerSweep

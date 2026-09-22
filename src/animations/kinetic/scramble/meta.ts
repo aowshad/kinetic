@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const scramble: AnimationModule = {
   id: 'scramble',
@@ -11,8 +12,8 @@ const scramble: AnimationModule = {
   defaults: { duration: 1.2, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['ScrambleTextPlugin'],
   fitSafety: 0.78,
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default scramble
