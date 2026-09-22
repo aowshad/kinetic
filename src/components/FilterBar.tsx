@@ -91,18 +91,15 @@ export default function FilterBar({
         </div>
 
         <div className="filter-group">
-          <div className="filter-group-row">
-            <span className="filter-group-label">Dependencies</span>
-            <div className="filter-pills" role="group" aria-label="Filter by dependency">
-              <button
-                type="button"
-                aria-pressed={noDepsOnly}
-                onClick={onToggleNoDeps}
-                className="k-pill"
-              >
-                No dependencies
-              </button>
-            </div>
+          <div className="filter-pills" role="group" aria-label="Filter by dependency">
+            <button
+              type="button"
+              aria-pressed={noDepsOnly}
+              onClick={onToggleNoDeps}
+              className="k-pill"
+            >
+              No dependencies
+            </button>
           </div>
         </div>
 

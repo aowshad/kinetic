@@ -190,46 +190,6 @@ pre,
   color: var(--accent-fg);
 }
 
-/* ---------- engine control ---------- */
-
-.engine-control {
-  display: inline-flex;
-  border: 1px solid var(--pill-border);
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.engine-control-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  block-size: 34px;
-  padding-inline: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  background: transparent;
-  border: none;
-  border-inline-start: 1px solid var(--pill-border);
-  color: var(--muted);
-  cursor: pointer;
-  transition: color 150ms ease, background-color 150ms ease;
-}
-
-.engine-control-btn:first-child {
-  border-inline-start: none;
-}
-
-.engine-control-btn:hover {
-  color: var(--text);
-  background: var(--pill-hover-bg);
-}
-
-.engine-control-btn[aria-pressed="true"] {
-  background: var(--accent);
-  color: var(--accent-fg);
-}
-
 /* ---------- hero / sample text ---------- */
 
 .hero {
@@ -923,40 +883,33 @@ pre,
   min-block-size: 0;
 }
 
-.code-drawer-scroll {
-  margin: 20px 0 0;
-  max-block-size: 316px;
+/* Card drawers constrain the shared CodeTabs panel to a scrollable height
+   with a sticky tab bar, matching the old per-card code block's behavior —
+   the Detail page's own (unconstrained, top-level) .detail-code is untouched
+   since this only matches one nested inside a card's drawer. */
+.drawer-inner .detail-code {
+  margin-block-start: 20px;
+  max-block-size: 320px;
   overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--code-surface);
   scrollbar-width: thin;
   scrollbar-color: var(--border-hover) transparent;
 }
 
-.code-drawer-scroll::-webkit-scrollbar {
+.drawer-inner .detail-code::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-.code-drawer-scroll::-webkit-scrollbar-thumb {
+.drawer-inner .detail-code::-webkit-scrollbar-thumb {
   background: var(--border-hover);
   border-radius: 3px;
 }
 
-.code-drawer-bar {
+.drawer-inner .detail-code-bar {
   position: sticky;
   top: 0;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  block-size: 36px;
-  padding-inline: 12px;
   background: var(--code-surface);
-  border-bottom: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--muted);
 }
 
 .code-copy-btn {

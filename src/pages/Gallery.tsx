@@ -6,7 +6,6 @@ import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
 import SampleTextHero from '../components/SampleTextHero'
 import ThemeControl from '../components/ThemeControl'
-import EngineControl from '../components/EngineControl'
 import { useSampleText } from '../lib/useSampleText'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
 import type { Category, TextRole } from '../lib/types'
@@ -126,7 +125,6 @@ export default function Gallery({
             </p>
           </div>
           <div className="page-header-controls">
-            <EngineControl engine={engine} onChange={setEngine} />
             <ThemeControl mode={theme} onChange={onThemeToggle} />
           </div>
         </div>
@@ -184,7 +182,7 @@ export default function Gallery({
               {category} <span>· {entries.length}</span>
             </h2>
             {entries.map((entry) => (
-              <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} engine={engine} />
+              <AnimationCard key={entry.module.id} entry={entry} sampleText={sampleText} engine={engine} onEngineChange={setEngine} />
             ))}
           </div>
         ))}

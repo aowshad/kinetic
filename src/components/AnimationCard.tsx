@@ -2,10 +2,11 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Check, Link2, Pause, Play } from 'lucide-react'
 import Stage from './Stage'
-import CodeBlock from './CodeBlock'
+import CodeTabs from './CodeTabs'
 import { useAnimation } from '../lib/useAnimation'
 import { useInView } from '../lib/useInView'
 import { usePrefersReducedMotion } from '../lib/usePrefersReducedMotion'
+import { emitReact, emitVanilla, emitVanillaJS } from '../lib/emit'
 import type { Engine } from '../lib/usePreviewEngine'
 import type { CatalogEntry, TextRole } from '../lib/types'
 
@@ -22,12 +23,14 @@ export default function AnimationCard({
   entry,
   sampleText,
   engine,
+  onEngineChange,
 }: {
   entry: CatalogEntry
   sampleText: string
   engine: Engine
+  onEngineChange: (e: Engine) => void
 }) {
-  const { module, source } = entry
+  const { module, source, vanillaSource, css } = entry
   const [replayKey, setReplayKey] = useState(0)
   const [showCode, setShowCode] = useState(false)
   const [openedOnce, setOpenedOnce] = useState(false)
@@ -57,6 +60,10 @@ export default function AnimationCard({
     setShowCode((v) => !v)
     setOpenedOnce(true)
   }
+
+  const jsGsap = openedOnce ? emitVanilla(module, source, module.defaults, css) : ''
+  const react = openedOnce ? emitReact(module, source, module.defaults, sampleText, css) : ''
+  const js = openedOnce && vanillaSource ? emitVanillaJS(module, vanillaSource, module.defaults, css) : null
 
   const copyLink = async () => {
     const url = `${location.origin}${location.pathname}#/a/${module.id}`
@@ -159,7 +166,20 @@ export default function AnimationCard({
         <p className="stage-note">{module.vanillaNote}</p>
       )}
       <div className="drawer" data-open={showCode}>
-        <div className="drawer-inner">{openedOnce && <CodeBlock code={source} />}</div>
+        <div className="drawer-inner">
+          {openedOnce && (
+            <CodeTabs
+              js={js}
+              jsGsap={jsGsap}
+              react={react}
+              source={source}
+              vanilla={module.vanilla}
+              vanillaNote={module.vanillaNote}
+              engine={engine}
+              onEngineChange={onEngineChange}
+            />
+          )}
+        </div>
       </div>
     </article>
   )
