@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const dropBounce: AnimationModule = {
   id: 'drop-bounce', name: 'Drop Bounce', category: 'entrance',
@@ -7,8 +8,8 @@ const dropBounce: AnimationModule = {
   blurb: 'Characters drop from above and bounce into place.',
   defaults: { duration: 0.8, stagger: 0.04, delay: 0, ease: 'bounce.out' },
   plugins: ['SplitText'],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'full',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default dropBounce
