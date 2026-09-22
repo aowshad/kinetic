@@ -8,6 +8,7 @@ const glitch: AnimationModule = {
   blurb: 'Red and cyan ghosts jitter apart before snapping back together.',
   defaults: { duration: 0.6, stagger: 0, delay: 0, ease: 'steps(6)' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

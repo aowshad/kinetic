@@ -8,6 +8,7 @@ const trackingWide: AnimationModule = {
   blurb: 'Hover or focus to spread the letters apart.',
   defaults: { duration: 0.35, stagger: 0, delay: 0, ease: 'power2.out' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

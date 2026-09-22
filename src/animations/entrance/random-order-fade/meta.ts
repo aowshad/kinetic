@@ -8,6 +8,7 @@ const randomOrderFade: AnimationModule = {
   blurb: 'Characters fade in one by one in a random order.',
   defaults: { duration: 0.4, stagger: 0.03, delay: 0, ease: 'power1.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

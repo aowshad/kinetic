@@ -8,6 +8,7 @@ const charRotateX: AnimationModule = {
   blurb: 'Characters flip up from a backward tilt into place.',
   defaults: { duration: 0.6, stagger: 0.03, delay: 0, ease: 'back.out(1.7)' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

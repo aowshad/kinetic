@@ -8,6 +8,7 @@ const textRoll: AnimationModule = {
   blurb: 'Hover or focus to roll the label up and reveal a duplicate.',
   defaults: { duration: 0.35, stagger: 0, delay: 0, ease: 'power3.out' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

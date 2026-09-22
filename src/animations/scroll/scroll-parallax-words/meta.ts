@@ -8,6 +8,7 @@ const scrollParallaxWords: AnimationModule = {
   blurb: 'Each word drifts upward at its own speed as the page scrolls.',
   defaults: { duration: 1, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['SplitText', 'ScrollTrigger'],
+  reducedMotion: 'skip', // scroll-position-driven, not duration-driven — nothing to settle toward
   vanilla: 'partial',
   vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
   impl: { gsap: run, vanilla: vanillaRun },

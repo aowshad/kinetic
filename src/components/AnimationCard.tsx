@@ -40,7 +40,7 @@ export default function AnimationCard({
   const isHover = module.category === 'hover'
   const isScroll = module.category === 'scroll'
   const prefersReducedMotion = usePrefersReducedMotion()
-  const loopBlocked = prefersReducedMotion && (isLoop || module.tags.includes('loop'))
+  const loopBlocked = prefersReducedMotion && module.reducedMotion === 'skip'
   const active = isLoop ? inView && isPlaying : inView
   const stageKey = `${sampleText}::${replayKey}`
   const ref = useAnimation<HTMLElement>(

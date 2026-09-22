@@ -59,8 +59,7 @@ export function useAnimation<T extends HTMLElement>(
       fitText(el, box, { ...fitRange, safety: module.fitSafety ?? 1 })
       const impl = engine === 'vanilla' && module.impl.vanilla ? module.impl.vanilla : module.impl.gsap
 
-      const isInfiniteLoop = module.category === 'loop' || module.tags.includes('loop')
-      if (prefersReducedMotion && isInfiniteLoop) {
+      if (prefersReducedMotion && module.reducedMotion === 'skip') {
         onPlaying?.(false)
         return
       }

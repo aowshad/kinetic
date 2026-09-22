@@ -64,7 +64,7 @@ function DetailView({
   const [isPlaying, setIsPlaying] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
-  const loopBlocked = prefersReducedMotion && (module.category === 'loop' || module.tags.includes('loop'))
+  const loopBlocked = prefersReducedMotion && module.reducedMotion === 'skip'
 
   useEffect(() => {
     if (!autoLoop) return

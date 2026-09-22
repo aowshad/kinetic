@@ -35,21 +35,18 @@ function indent(body: string, spaces: number): string {
     .join('\n')
 }
 
-// 'skip' — never runs under reduced motion (loop-tagged animations repeat
-// forever, so a near-zero duration would strobe rather than stop; scroll
-// animations aren't duration-driven at all, and at least 3 of the 7 apply a
-// degraded starting style — blur/clip/scale — synchronously before scroll
-// position ever takes over, so "running" them leaves that degraded style
-// stuck on screen until the user scrolls).
-// 'scramble' — runs, but needs a 0.35s floor: GSAP's ScrambleTextPlugin
+// The skip/settle split itself comes from module.reducedMotion — the single
+// source of truth also read by useAnimation, so the emitted snippets and the
+// live site can't drift apart the way they did before. 'scramble' is a
+// secondary, emitter-local refinement of 'settle': GSAP's ScrambleTextPlugin
 // revealDelay is an absolute number of seconds (worst case 0.3s in this
-// catalog), not a fraction of the tween's own duration, so anything shorter
-// leaves the GSAP path permanently scrambled.
-// 'normal' — runs at a near-instant 0.01s.
+// catalog), not a fraction of the tween's own duration, so these three need
+// a 0.35s floor instead of the usual near-instant 0.01s or the GSAP path
+// stays permanently scrambled.
 type ReducedMotionGroup = 'skip' | 'scramble' | 'normal'
 
 function reducedMotionGroup(module: AnimationModule): ReducedMotionGroup {
-  if (module.category === 'loop' || module.category === 'scroll' || module.tags.includes('loop')) return 'skip'
+  if (module.reducedMotion === 'skip') return 'skip'
   if (module.tags.includes('scramble')) return 'scramble'
   return 'normal'
 }

@@ -8,6 +8,7 @@ const flipY: AnimationModule = {
   blurb: 'Characters flip in from alternating directions on the Y axis.',
   defaults: { duration: 0.5, stagger: 0.025, delay: 0, ease: 'power2.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

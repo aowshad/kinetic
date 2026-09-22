@@ -8,6 +8,7 @@ const wave: AnimationModule = {
   blurb: 'Characters ripple up and down in an endless wave.',
   defaults: { duration: 0.5, stagger: 0.04, delay: 0, ease: 'sine.inOut' },
   plugins: ['SplitText'],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

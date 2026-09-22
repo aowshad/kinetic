@@ -8,6 +8,7 @@ const dropBounce: AnimationModule = {
   blurb: 'Characters drop from above and bounce into place.',
   defaults: { duration: 0.8, stagger: 0.04, delay: 0, ease: 'bounce.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

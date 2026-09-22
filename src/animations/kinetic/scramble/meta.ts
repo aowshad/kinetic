@@ -11,6 +11,7 @@ const scramble: AnimationModule = {
   blurb: 'Characters scramble through random glyphs before locking into the final text.',
   defaults: { duration: 1.2, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['ScrambleTextPlugin'],
+  reducedMotion: 'settle',
   fitSafety: 0.78,
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },

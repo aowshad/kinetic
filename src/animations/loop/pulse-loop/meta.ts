@@ -8,6 +8,7 @@ const pulseLoop: AnimationModule = {
   blurb: 'Text breathes with a soft, uniform pulse, forever.',
   defaults: { duration: 0.8, stagger: 0, delay: 0, ease: 'sine.inOut' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

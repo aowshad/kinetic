@@ -8,6 +8,7 @@ const marquee: AnimationModule = {
   blurb: 'Text scrolls sideways in an endless, seamless ticker.',
   defaults: { duration: 3, stagger: 0, delay: 0, ease: 'none' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

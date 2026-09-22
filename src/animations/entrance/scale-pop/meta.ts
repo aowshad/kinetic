@@ -8,6 +8,7 @@ const scalePop: AnimationModule = {
   blurb: 'Characters pop in from nothing in a random order.',
   defaults: { duration: 0.5, stagger: 0.03, delay: 0, ease: 'back.out(2)' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

@@ -8,6 +8,7 @@ const charScramble: AnimationModule = {
   blurb: 'Hover or focus to scramble the text before it decodes back.',
   defaults: { duration: 0.5, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['ScrambleTextPlugin'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

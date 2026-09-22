@@ -8,6 +8,7 @@ const exitScatter: AnimationModule = {
   blurb: 'Characters scatter outward in every direction and vanish.',
   defaults: { duration: 0.5, stagger: 0.03, delay: 0, ease: 'power2.in' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

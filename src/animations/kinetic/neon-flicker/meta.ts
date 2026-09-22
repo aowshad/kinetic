@@ -8,6 +8,7 @@ const neonFlicker: AnimationModule = {
   blurb: 'Text glows like a neon sign, flickering unevenly before it settles.',
   defaults: { duration: 0.1, stagger: 0, delay: 0, ease: 'steps(1)' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

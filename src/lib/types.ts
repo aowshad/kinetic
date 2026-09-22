@@ -17,6 +17,21 @@ export interface AnimationOptions {
 
 export type AnimationImpl = (el: HTMLElement, o: AnimationOptions, onComplete?: () => void) => () => void
 
+/**
+ * How this animation behaves when the visitor prefers reduced motion.
+ * 'settle' — plays once, near-instantly, landing on its real authored end
+ *            state (exit animations finish hidden, entrance/kinetic ones
+ *            finish revealed). This is the default for one-shot animations.
+ * 'skip'   — never runs at all. The only two reasons that's correct here:
+ *            (a) it repeats forever, so forcing a near-zero duration would
+ *            strobe rather than stop it, or (b) it's scroll-position-driven
+ *            rather than duration-driven, so there's no duration to shrink
+ *            in the first place — some of these also apply a degraded
+ *            starting style (blur/clip/scale) before scroll position ever
+ *            takes over, which would otherwise be stuck on screen.
+ */
+export type ReducedMotion = 'settle' | 'skip'
+
 export interface AnimationModule {
   id: string
   name: string
@@ -29,6 +44,7 @@ export interface AnimationModule {
   fitSafety?: number
   vanilla: VanillaTier
   vanillaNote?: string
+  reducedMotion: ReducedMotion
   impl: {
     gsap: AnimationImpl
     vanilla?: AnimationImpl

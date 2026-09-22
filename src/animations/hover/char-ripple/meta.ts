@@ -8,6 +8,7 @@ const charRipple: AnimationModule = {
   blurb: 'Hover or focus to send an endless ripple through the characters.',
   defaults: { duration: 0.45, stagger: 0.035, delay: 0, ease: 'sine.inOut' },
   plugins: ['SplitText'],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

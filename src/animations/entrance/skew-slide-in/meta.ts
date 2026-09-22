@@ -8,6 +8,7 @@ const skewSlideIn: AnimationModule = {
   blurb: 'Each word slides in from the left with a skew.',
   defaults: { duration: 0.5, stagger: 0.05, delay: 0, ease: 'power3.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

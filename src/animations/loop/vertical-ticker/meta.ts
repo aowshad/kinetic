@@ -8,6 +8,7 @@ const verticalTicker: AnimationModule = {
   blurb: 'Text scrolls upward in an endless vertical loop, like a credits reel.',
   defaults: { duration: 3, stagger: 0, delay: 0, ease: 'none' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

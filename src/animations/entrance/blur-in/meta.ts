@@ -11,6 +11,7 @@ const blurIn: AnimationModule = {
   blurb: 'Characters sharpen into focus as they fade in from a blur.',
   defaults: { duration: 0.5, stagger: 0.02, delay: 0, ease: 'power2.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

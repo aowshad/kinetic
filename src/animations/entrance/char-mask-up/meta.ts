@@ -8,6 +8,7 @@ const charMaskUp: AnimationModule = {
   blurb: 'Each character slides up from behind a tight clipping mask.',
   defaults: { duration: 0.5, stagger: 0.025, delay: 0, ease: 'expo.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

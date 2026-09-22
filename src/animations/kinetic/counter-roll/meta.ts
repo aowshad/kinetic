@@ -8,6 +8,7 @@ const counterRoll: AnimationModule = {
   blurb: 'Digits count up from zero to the target number. Type a number as the sample text to try it.',
   defaults: { duration: 1.2, stagger: 0, delay: 0, ease: 'power2.out' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

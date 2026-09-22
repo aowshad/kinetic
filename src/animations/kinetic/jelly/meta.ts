@@ -8,6 +8,7 @@ const jelly: AnimationModule = {
   blurb: 'The whole word squashes and stretches like jelly, endlessly.',
   defaults: { duration: 0.5, stagger: 0, delay: 0, ease: 'elastic.out(1, 0.3)' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

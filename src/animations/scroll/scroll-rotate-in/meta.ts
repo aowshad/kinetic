@@ -8,6 +8,7 @@ const scrollRotateIn: AnimationModule = {
   blurb: 'Characters tumble upright one after another as you scroll.',
   defaults: { duration: 0.5, stagger: 0.04, delay: 0, ease: 'power2.out' },
   plugins: ['SplitText', 'ScrollTrigger'],
+  reducedMotion: 'skip', // scroll-position-driven, not duration-driven — nothing to settle toward
   vanilla: 'partial',
   vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
   impl: { gsap: run, vanilla: vanillaRun },

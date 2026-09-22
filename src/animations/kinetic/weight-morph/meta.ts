@@ -8,6 +8,7 @@ const weightMorph: AnimationModule = {
   blurb: 'Text breathes between light and bold weight, endlessly.',
   defaults: { duration: 0.9, stagger: 0, delay: 0, ease: 'sine.inOut' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

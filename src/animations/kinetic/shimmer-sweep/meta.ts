@@ -8,6 +8,7 @@ const shimmerSweep: AnimationModule = {
   blurb: 'A soft band of light sweeps across the text on an endless loop.',
   defaults: { duration: 2, stagger: 0, delay: 0, ease: 'none' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

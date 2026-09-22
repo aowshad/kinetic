@@ -8,6 +8,7 @@ const underlineWipe: AnimationModule = {
   blurb: 'Hover or focus to wipe an accent underline in from the left.',
   defaults: { duration: 0.3, stagger: 0, delay: 0, ease: 'power3.out' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

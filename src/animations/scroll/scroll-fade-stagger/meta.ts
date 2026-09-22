@@ -8,6 +8,7 @@ const scrollFadeStagger: AnimationModule = {
   blurb: 'Characters rise and fade in one after another as you scroll.',
   defaults: { duration: 0.6, stagger: 0.03, delay: 0, ease: 'power2.out' },
   plugins: ['SplitText', 'ScrollTrigger'],
+  reducedMotion: 'skip', // scroll-position-driven, not duration-driven — nothing to settle toward
   vanilla: 'partial',
   vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
   impl: { gsap: run, vanilla: vanillaRun },

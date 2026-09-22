@@ -8,6 +8,7 @@ const inkFill: AnimationModule = {
   blurb: 'Hover or focus to fill the text with accent color from left to right.',
   defaults: { duration: 0.4, stagger: 0, delay: 0, ease: 'power3.out' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

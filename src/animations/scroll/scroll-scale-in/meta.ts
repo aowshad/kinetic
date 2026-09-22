@@ -8,6 +8,7 @@ const scrollScaleIn: AnimationModule = {
   blurb: 'Text scales up to full size as it scrolls to the center of the screen.',
   defaults: { duration: 1, stagger: 0, delay: 0, ease: 'none' },
   plugins: ['ScrollTrigger'],
+  reducedMotion: 'skip', // scroll-position-driven, not duration-driven — nothing to settle toward
   vanilla: 'partial',
   vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
   impl: { gsap: run, vanilla: vanillaRun },

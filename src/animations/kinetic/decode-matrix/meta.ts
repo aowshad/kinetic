@@ -8,6 +8,7 @@ const decodeMatrix: AnimationModule = {
   blurb: 'Each character decodes from scrambled noise, one after another.',
   defaults: { duration: 0.4, stagger: 0.05, delay: 0, ease: 'none' },
   plugins: ['ScrambleTextPlugin', 'SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

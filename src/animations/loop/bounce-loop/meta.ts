@@ -8,6 +8,7 @@ const bounceLoop: AnimationModule = {
   blurb: 'Text bounces up and down endlessly, like a ball at rest.',
   defaults: { duration: 0.6, stagger: 0, delay: 0, ease: 'bounce.out' },
   plugins: [],
+  reducedMotion: 'skip', // repeats forever — a near-zero duration would strobe rather than stop
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

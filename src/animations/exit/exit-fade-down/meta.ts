@@ -8,6 +8,7 @@ const exitFadeDown: AnimationModule = {
   blurb: 'Text fades away as it drifts gently downward.',
   defaults: { duration: 0.5, stagger: 0, delay: 0, ease: 'power2.in' },
   plugins: [],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

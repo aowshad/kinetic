@@ -8,6 +8,7 @@ const lineMaskUp: AnimationModule = {
   blurb: 'Each line slides up from behind a clipped mask.',
   defaults: { duration: 0.7, stagger: 0.12, delay: 0, ease: 'power4.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

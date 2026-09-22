@@ -8,6 +8,7 @@ const letterPop: AnimationModule = {
   blurb: 'Hover or focus to pop each character up and back with a bounce.',
   defaults: { duration: 0.4, stagger: 0.03, delay: 0, ease: 'back.out(3)' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }

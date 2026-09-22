@@ -11,6 +11,7 @@ const charFadeUp: AnimationModule = {
   blurb: 'Each character rises up and fades in, staggered left to right.',
   defaults: { duration: 0.6, stagger: 0.02, delay: 0, ease: 'power3.out' },
   plugins: ['SplitText'],
+  reducedMotion: 'settle',
   vanilla: 'full',
   impl: { gsap: run, vanilla: vanillaRun },
 }
