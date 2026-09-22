@@ -1,5 +1,6 @@
 import type { AnimationModule } from '../../../lib/types'
 import { run } from './gsap'
+import { run as vanillaRun } from './vanilla'
 
 const scrollColorSweep: AnimationModule = {
   id: 'scroll-color-sweep', name: 'Scroll Color Sweep', category: 'scroll',
@@ -7,8 +8,9 @@ const scrollColorSweep: AnimationModule = {
   blurb: 'Words pick up an accent color one by one as you scroll past them.',
   defaults: { duration: 0.5, stagger: 0.1, delay: 0, ease: 'none' },
   plugins: ['SplitText', 'ScrollTrigger'],
-  vanilla: 'none',
-  impl: { gsap: run },
+  vanilla: 'partial',
+  vanillaNote: 'No scrub smoothing on browsers without scroll-driven animation support (Safari before 26) — falls back to coarser IntersectionObserver-driven updates.',
+  impl: { gsap: run, vanilla: vanillaRun },
 }
 
 export default scrollColorSweep
