@@ -3,11 +3,10 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Check, Link2, Play, Repeat } from 'lucide-react'
 import catalog from '../animations/registry'
 import Stage from '../components/Stage'
-import ControlPanel, { type Align } from '../components/ControlPanel'
+import ControlPanel, { DEFAULT_ALIGN, type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
-import EngineControl from '../components/EngineControl'
 import { useAnimation } from '../lib/useAnimation'
-import { useSampleText } from '../lib/useSampleText'
+import { DEFAULT_SAMPLE_TEXT, useSampleText } from '../lib/useSampleText'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
 import { usePrefersReducedMotion } from '../lib/usePrefersReducedMotion'
 import { emitReact, emitVanilla, emitVanillaJS } from '../lib/emit'
@@ -55,7 +54,7 @@ function DetailView({
   const { module, source, vanillaSource, css } = entry
   const [sampleText, setSampleText] = useSampleText()
   const [engine, setEngine] = usePreviewEngine()
-  const [align, setAlign] = useState<Align>('center')
+  const [align, setAlign] = useState<Align>(DEFAULT_ALIGN)
   const [options, setOptions] = useState<AnimationOptions>(module.defaults)
   const [previewEase, setPreviewEase] = useState<string | null>(null)
   const [replayKey, setReplayKey] = useState(0)
@@ -95,6 +94,13 @@ function DetailView({
     setTimeout(() => setLinkCopied(false), 2000)
   }
 
+  const resetAll = () => {
+    setSampleText(DEFAULT_SAMPLE_TEXT)
+    setAlign(DEFAULT_ALIGN)
+    setOptions(module.defaults)
+    setPreviewEase(null)
+  }
+
   return (
     <div className="min-h-screen px-6 py-16">
       <div className="mx-auto max-w-[1100px]">
@@ -113,14 +119,9 @@ function DetailView({
           <div className="detail-title-group">
             <h1 className="detail-title">{module.name}</h1>
             <span className="k-chip">{module.category}</span>
-            {module.vanilla === 'full' && (
-              <span className="k-deps-badge k-deps-badge-full" title="Runs on the Web Animations API — no GSAP needed">
-                No deps
-              </span>
-            )}
             {module.vanilla === 'partial' && (
               <span className="k-deps-badge k-deps-badge-partial" title={module.vanillaNote}>
-                No deps*
+                Partial
               </span>
             )}
             {module.vanilla === 'none' && (
@@ -128,11 +129,12 @@ function DetailView({
                 GSAP
               </span>
             )}
-            {module.plugins.map((p) => (
-              <span key={p} className="plugin-badge" title="Included free in GSAP 3.13+">
-                {p}
-              </span>
-            ))}
+            {engine === 'gsap' &&
+              module.plugins.map((p) => (
+                <span key={p} className="plugin-badge" title="Included free in GSAP 3.13+">
+                  {p}
+                </span>
+              ))}
           </div>
         </div>
         <p className="detail-blurb">{module.blurb}</p>
@@ -147,42 +149,37 @@ function DetailView({
           <p className="stage-note">{module.vanillaNote}</p>
         )}
         <div className="stage-toolbar">
-          <div className="stage-toolbar-left">
-            {module.vanilla !== 'none' && <EngineControl engine={engine} onChange={setEngine} />}
-          </div>
-          <div className="stage-toolbar-right">
-            {isHover ? (
-              <span className="k-hint">Hover the text</span>
-            ) : isScroll ? (
-              <span className="k-hint">Scroll the page</span>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={isPlaying || loopBlocked}
-                  aria-label={loopBlocked ? 'Replay disabled — reduced motion is on' : `Play ${module.name} animation`}
-                  title={loopBlocked ? 'This loops forever, so replay stays off while reduced motion is on' : undefined}
-                  onClick={() => setReplayKey((k) => k + 1)}
-                  className="k-play-btn"
-                >
-                  <Play size={14} />
-                  {loopBlocked ? 'Reduced motion' : isPlaying ? 'Playing…' : 'Play'}
-                </button>
-                <button
-                  type="button"
-                  disabled={loopBlocked}
-                  aria-pressed={autoLoop}
-                  aria-label={loopBlocked ? 'Loop playback disabled — reduced motion is on' : 'Loop playback every 1.2s'}
-                  title={loopBlocked ? 'Reduced motion is on' : 'Loop playback every 1.2s'}
-                  onClick={() => setAutoLoop((v) => !v)}
-                  className="k-play-btn"
-                >
-                  <Repeat size={14} />
-                  Loop
-                </button>
-              </>
-            )}
-          </div>
+          {isHover ? (
+            <span className="k-hint">Hover the text</span>
+          ) : isScroll ? (
+            <span className="k-hint">Scroll the page</span>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={isPlaying || loopBlocked}
+                aria-label={loopBlocked ? 'Replay disabled — reduced motion is on' : `Play ${module.name} animation`}
+                title={loopBlocked ? 'This loops forever, so replay stays off while reduced motion is on' : undefined}
+                onClick={() => setReplayKey((k) => k + 1)}
+                className="k-play-btn"
+              >
+                <Play size={14} />
+                {loopBlocked ? 'Reduced motion' : isPlaying ? 'Playing…' : 'Play'}
+              </button>
+              <button
+                type="button"
+                disabled={loopBlocked}
+                aria-pressed={autoLoop}
+                aria-label={loopBlocked ? 'Loop playback disabled — reduced motion is on' : 'Loop playback every 1.2s'}
+                title={loopBlocked ? 'Reduced motion is on' : 'Loop playback every 1.2s'}
+                onClick={() => setAutoLoop((v) => !v)}
+                className="k-play-btn"
+              >
+                <Repeat size={14} />
+                Loop
+              </button>
+            </>
+          )}
         </div>
 
         <ControlPanel
@@ -193,7 +190,7 @@ function DetailView({
           options={options}
           defaults={module.defaults}
           onChange={setOptions}
-          onReset={() => setOptions(module.defaults)}
+          onResetAll={resetAll}
           onPreviewEase={setPreviewEase}
         />
 

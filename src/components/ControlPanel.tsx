@@ -1,9 +1,10 @@
-import { AlignCenter, AlignLeft, AlignRight, RotateCcw } from 'lucide-react'
+import { AlignCenter, AlignLeft, AlignRight, RotateCcw, X } from 'lucide-react'
 import EasePicker from './EasePicker'
-import { SAMPLE_TEXT_MAX } from '../lib/useSampleText'
+import { DEFAULT_SAMPLE_TEXT, SAMPLE_TEXT_MAX } from '../lib/useSampleText'
 import type { AnimationOptions } from '../lib/types'
 
 export type Align = 'left' | 'center' | 'right'
+export const DEFAULT_ALIGN: Align = 'center'
 
 const SLIDER_SPECS = [
   { key: 'duration', label: 'Duration', min: 0.1, max: 3, step: 0.05, decimals: 2 },
@@ -19,7 +20,7 @@ export default function ControlPanel({
   options,
   defaults,
   onChange,
-  onReset,
+  onResetAll,
   onPreviewEase,
 }: {
   sampleText: string
@@ -29,25 +30,60 @@ export default function ControlPanel({
   options: AnimationOptions
   defaults: AnimationOptions
   onChange: (o: AnimationOptions) => void
-  onReset: () => void
+  onResetAll: () => void
   onPreviewEase: (ease: string | null) => void
 }) {
   const set = <K extends keyof AnimationOptions>(key: K, value: AnimationOptions[K]) =>
     onChange({ ...options, [key]: value })
 
-  const isDefault = JSON.stringify(options) === JSON.stringify(defaults)
+  const sampleIsDefault = sampleText === DEFAULT_SAMPLE_TEXT
+  const allDefault = sampleIsDefault && align === DEFAULT_ALIGN && JSON.stringify(options) === JSON.stringify(defaults)
+
+  const resetSampleText = () => onSampleTextChange(DEFAULT_SAMPLE_TEXT)
+
+  const handleSampleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape' && !sampleIsDefault) {
+      e.preventDefault()
+      resetSampleText()
+    }
+  }
 
   return (
     <div className="control-bar">
+      <div className="control-bar-header">
+        <span className="control-section-label">Sample text</span>
+        <button type="button" disabled={allDefault} onClick={onResetAll} className="k-ghost-btn control-reset-all">
+          <RotateCcw size={13} />
+          Reset all
+        </button>
+      </div>
+
       <div className="control-row-1">
-        <label className="control-field control-sample">
-          <span>Sample text</span>
-          <input
-            value={sampleText}
-            maxLength={SAMPLE_TEXT_MAX}
-            onChange={(e) => onSampleTextChange(e.target.value)}
-          />
-        </label>
+        <div className="control-field control-sample">
+          <div className="control-sample-field">
+            <input
+              value={sampleText}
+              maxLength={SAMPLE_TEXT_MAX}
+              onChange={(e) => onSampleTextChange(e.target.value)}
+              onKeyDown={handleSampleKeyDown}
+              aria-label="Sample text"
+            />
+            <button
+              type="button"
+              onClick={resetSampleText}
+              aria-label="Reset to default text"
+              title="Reset to default text"
+              className="control-sample-clear"
+              data-visible={!sampleIsDefault}
+              tabIndex={sampleIsDefault ? -1 : 0}
+            >
+              <X size={14} />
+            </button>
+            <span className="control-sample-counter">
+              {sampleText.length}/{SAMPLE_TEXT_MAX}
+            </span>
+          </div>
+        </div>
 
         <div className="control-field">
           <span>Align</span>
@@ -97,25 +133,21 @@ export default function ControlPanel({
                 <span>s</span>
               </div>
             </div>
-            <input
-              type="range"
-              min={spec.min}
-              max={spec.max}
-              step={spec.step}
-              value={options[spec.key]}
-              onChange={(e) => set(spec.key, Number(e.target.value))}
-              className="control-range"
-            />
-            <div className="slider-bounds">
-              <span>{spec.min}</span>
-              <span>{spec.max}</span>
+            <div className="control-slider-track">
+              <span className="slider-bound">{spec.min}</span>
+              <input
+                type="range"
+                min={spec.min}
+                max={spec.max}
+                step={spec.step}
+                value={options[spec.key]}
+                onChange={(e) => set(spec.key, Number(e.target.value))}
+                className="control-range"
+              />
+              <span className="slider-bound">{spec.max}</span>
             </div>
           </div>
         ))}
-        <button type="button" disabled={isDefault} onClick={onReset} className="k-ghost-btn control-reset">
-          <RotateCcw size={13} />
-          Reset
-        </button>
       </div>
     </div>
   )
