@@ -1285,6 +1285,13 @@ pre,
   color: var(--muted);
 }
 
+.scroll-scrub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
 /* ---------- ease picker ---------- */
 
 .ease-picker {

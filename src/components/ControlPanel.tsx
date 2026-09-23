@@ -22,6 +22,7 @@ export default function ControlPanel({
   onChange,
   onResetAll,
   onPreviewEase,
+  hideMotionSliders = false,
 }: {
   sampleText: string
   onSampleTextChange: (v: string) => void
@@ -32,6 +33,7 @@ export default function ControlPanel({
   onChange: (o: AnimationOptions) => void
   onResetAll: () => void
   onPreviewEase: (ease: string | null) => void
+  hideMotionSliders?: boolean
 }) {
   const set = <K extends keyof AnimationOptions>(key: K, value: AnimationOptions[K]) =>
     onChange({ ...options, [key]: value })
@@ -116,39 +118,41 @@ export default function ControlPanel({
         </div>
       </div>
 
-      <div className="control-row-2">
-        {SLIDER_SPECS.map((spec) => (
-          <div key={spec.key} className="control-slider-block">
-            <div className="control-slider-head">
-              <span>{spec.label}</span>
-              <div className="control-number">
+      {!hideMotionSliders && (
+        <div className="control-row-2">
+          {SLIDER_SPECS.map((spec) => (
+            <div key={spec.key} className="control-slider-block">
+              <div className="control-slider-head">
+                <span>{spec.label}</span>
+                <div className="control-number">
+                  <input
+                    type="number"
+                    min={spec.min}
+                    max={spec.max}
+                    step={spec.step}
+                    value={options[spec.key].toFixed(spec.decimals)}
+                    onChange={(e) => set(spec.key, Number(e.target.value))}
+                  />
+                  <span>s</span>
+                </div>
+              </div>
+              <div className="control-slider-track">
+                <span className="slider-bound">{spec.min}</span>
                 <input
-                  type="number"
+                  type="range"
                   min={spec.min}
                   max={spec.max}
                   step={spec.step}
-                  value={options[spec.key].toFixed(spec.decimals)}
+                  value={options[spec.key]}
                   onChange={(e) => set(spec.key, Number(e.target.value))}
+                  className="control-range"
                 />
-                <span>s</span>
+                <span className="slider-bound">{spec.max}</span>
               </div>
             </div>
-            <div className="control-slider-track">
-              <span className="slider-bound">{spec.min}</span>
-              <input
-                type="range"
-                min={spec.min}
-                max={spec.max}
-                step={spec.step}
-                value={options[spec.key]}
-                onChange={(e) => set(spec.key, Number(e.target.value))}
-                className="control-range"
-              />
-              <span className="slider-bound">{spec.max}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

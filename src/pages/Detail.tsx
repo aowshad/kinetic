@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Check, Link2, Play, Repeat } from 'lucide-react'
 import catalog from '../animations/registry'
 import Stage from '../components/Stage'
+import ScrollStage from '../components/ScrollStage'
 import ControlPanel, { DEFAULT_ALIGN, type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
 import { useAnimation } from '../lib/useAnimation'
@@ -63,8 +64,23 @@ function DetailView({
   const isScroll = module.category === 'scroll'
   const [isPlaying, setIsPlaying] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const scrollTrackRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = usePrefersReducedMotion()
   const loopBlocked = prefersReducedMotion && module.reducedMotion === 'skip'
+
+  const handleTrackScroll = (el: HTMLDivElement) => {
+    const max = el.scrollHeight - el.clientHeight
+    setScrollProgress(max > 0 ? (el.scrollTop / max) * 100 : 0)
+  }
+
+  const handleScrub = (percent: number) => {
+    setScrollProgress(percent)
+    const el = scrollTrackRef.current
+    if (!el) return
+    const max = el.scrollHeight - el.clientHeight
+    el.scrollTop = (percent / 100) * max
+  }
 
   useEffect(() => {
     if (!autoLoop) return
@@ -142,14 +158,33 @@ function DetailView({
           <p className="needs-gsap-note">{module.vanillaNote ?? 'Needs GSAP — no zero-dependency equivalent for this animation.'}</p>
         )}
 
-        <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
-          <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
-        </div>
+        {isScroll ? (
+          <ScrollStage className="detail-stage" ref={scrollTrackRef} onTrackScroll={handleTrackScroll}>
+            <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+          </ScrollStage>
+        ) : (
+          <div className="stage detail-stage" style={{ justifyItems: align === 'left' ? 'start' : align === 'right' ? 'end' : 'center', textAlign: align }}>
+            <Stage key={stageKey} ref={ref} role={module.roles[0]} text={sampleText} />
+          </div>
+        )}
         <div className="stage-toolbar">
           {isHover ? (
             <span className="k-hint">Hover the text</span>
           ) : isScroll ? (
-            <span className="k-hint">Scroll the page</span>
+            <div className="scroll-scrub">
+              <span className="slider-bound">0%</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={0.1}
+                value={scrollProgress}
+                onChange={(e) => handleScrub(Number(e.target.value))}
+                className="control-range"
+                aria-label="Scroll progress"
+              />
+              <span className="slider-bound">100%</span>
+            </div>
           ) : (
             <>
               <button
@@ -189,6 +224,7 @@ function DetailView({
           onChange={setOptions}
           onResetAll={resetAll}
           onPreviewEase={setPreviewEase}
+          hideMotionSliders={isScroll}
         />
 
         <CodeTabs
