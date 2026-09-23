@@ -74,6 +74,7 @@ function DetailView({
     title: `${module.name} — ${SITE_NAME} text animation`,
     description: `${module.blurb} A copy-paste ${module.category} text animation in zero-dependency JS, GSAP, or React.`,
     path: `a/${module.id}/`,
+    image: `og/${module.id}.png`,
   })
 
   const handleTrackScroll = (el: HTMLDivElement) => {

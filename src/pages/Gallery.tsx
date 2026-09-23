@@ -29,7 +29,7 @@ export default function Gallery({
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [installCopied, setInstallCopied] = useState(false)
 
-  useDocumentMeta({ title: SITE_TITLE, description: SITE_DESCRIPTION, path: '' })
+  useDocumentMeta({ title: SITE_TITLE, description: SITE_DESCRIPTION, path: '', image: 'og/default.png' })
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)

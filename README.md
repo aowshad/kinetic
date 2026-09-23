@@ -40,8 +40,9 @@ npm run dev
 ```
 
 ```bash
-npm run build    # production build to dist/
+npm run build    # production build to dist/, then pre-render every route
 npm run gifs     # re-record docs/gifs/ from the running site
+npm run og       # re-render the social preview cards in public/og/
 ```
 
 ## Categories

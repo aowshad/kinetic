@@ -16,14 +16,14 @@
  *   node scripts/capture-gifs.mjs --headed        # watch it work
  */
 import { execFile } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import ffmpegPath from 'ffmpeg-static'
 import { chromium } from 'playwright'
 import { createServer } from 'vite'
+import { readCatalog, sampleFor } from './lib/catalog.mjs'
 
 const execFileAsync = promisify(execFile)
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
@@ -40,19 +40,6 @@ const END_HOLD_S = 0.45 // how much of that hold survives into the gif
 const SCROLL_MS = 2200 // how long a scroll animation takes to scrub end to end
 const MAX_ANIM_MS = 4000
 
-/**
- * Per text role, because the default sample text has no digits — a counter
- * animation given "I Love Bangladesh" correctly does nothing at all.
- */
-const SAMPLE_TEXT = {
-  heading: 'Kinetic',
-  paragraph: 'Text that moves with intent.',
-  button: 'Get started',
-  link: 'Read more',
-  label: 'NEW',
-  counter: '1,260',
-}
-
 const args = process.argv.slice(2)
 const flag = (name) => args.includes(`--${name}`)
 const value = (name, fallback) => {
@@ -61,32 +48,6 @@ const value = (name, fallback) => {
 }
 const only = args.reduce((acc, a, i) => (a === '--only' && args[i + 1] ? [...acc, args[i + 1]] : acc), [])
 const GIF_WIDTH = Number(value('width', '480'))
-
-/** Reads id/name/category/defaults straight out of each meta.ts. */
-async function readCatalog() {
-  const entries = []
-  for (const category of await readdir(animationsDir)) {
-    const categoryDir = join(animationsDir, category)
-    if (!(await stat(categoryDir)).isDirectory()) continue
-    for (const id of await readdir(categoryDir)) {
-      const metaPath = join(categoryDir, id, 'meta.ts')
-      if (!existsSync(metaPath)) continue
-      const src = await readFile(metaPath, 'utf8')
-      const pick = (key) => src.match(new RegExp(`\\b${key}:\\s*'([^']*)'`))?.[1]
-      const num = (key) => Number(src.match(new RegExp(`\\b${key}:\\s*([\\d.]+)`))?.[1] ?? 0)
-      entries.push({
-        id: pick('id') ?? id,
-        name: pick('name') ?? id,
-        category: pick('category') ?? category,
-        role: src.match(/roles:\s*\['([^']*)'/)?.[1] ?? 'heading',
-        duration: num('duration'),
-        stagger: num('stagger'),
-        delay: num('delay'),
-      })
-    }
-  }
-  return entries.sort((a, b) => a.name.localeCompare(b.name))
-}
 
 /**
  * CLAUDE.md: a throttled clock invalidates every timing decision below — the
@@ -241,7 +202,7 @@ async function toGif(webm, out, crop, trimStart, clipSeconds) {
 }
 
 async function main() {
-  const catalog = (await readCatalog()).filter((e) => only.length === 0 || only.includes(e.id))
+  const catalog = (await readCatalog(animationsDir)).filter((e) => only.length === 0 || only.includes(e.id))
   if (catalog.length === 0) throw new Error(`No animations matched ${only.join(', ')}`)
 
   await mkdir(gifDir, { recursive: true })
@@ -277,7 +238,7 @@ async function main() {
   const written = []
 
   for (const entry of catalog) {
-    const text = SAMPLE_TEXT[entry.role] ?? SAMPLE_TEXT.heading
+    const text = sampleFor(entry.role)
     const context = await browser.newContext({
       viewport: VIEWPORT,
       deviceScaleFactor: 1,

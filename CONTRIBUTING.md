@@ -123,3 +123,14 @@ It records each animation from the running site and palette-quantises a gif
 per animation. `--from-cache` re-encodes from the cached webm without driving
 the browser again, and `--headed` lets you watch it work. Only commit the gif
 for the animation you added.
+
+Each animation also has a 1200×630 social card in `public/og/`, used as its
+`og:image` so a shared link unfurls with the animation rather than bare text:
+
+```bash
+npm run og -- --only blur-in
+```
+
+The card is the detail page with its chrome hidden, caught partway through the
+animation — so it inherits the site's own type and colour, and shows the
+effect mid-flight instead of resolved text that looks like every other card.

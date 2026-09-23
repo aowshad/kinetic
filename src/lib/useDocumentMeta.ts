@@ -17,16 +17,31 @@ function setTag(selector: string, attr: 'content' | 'href', value: string) {
  * ends up in each route's static HTML — and therefore what a crawler that
  * never runs the bundle sees.
  */
-export function useDocumentMeta({ title, description, path }: { title: string; description: string; path: string }) {
+export function useDocumentMeta({
+  title,
+  description,
+  path,
+  image,
+}: {
+  title: string
+  description: string
+  path: string
+  /** Relative to the site root; unfurlers need it resolved to an absolute URL. */
+  image: string
+}) {
   useEffect(() => {
     const url = new URL(path, SITE_URL).href
+    const imageUrl = new URL(image, SITE_URL).href
     document.title = title
     setTag('meta[name="description"]', 'content', description)
     setTag('link[rel="canonical"]', 'href', url)
     setTag('meta[property="og:title"]', 'content', title)
     setTag('meta[property="og:description"]', 'content', description)
     setTag('meta[property="og:url"]', 'content', url)
+    setTag('meta[property="og:image"]', 'content', imageUrl)
+    setTag('meta[property="og:image:alt"]', 'content', title)
     setTag('meta[name="twitter:title"]', 'content', title)
     setTag('meta[name="twitter:description"]', 'content', description)
-  }, [title, description, path])
+    setTag('meta[name="twitter:image"]', 'content', imageUrl)
+  }, [title, description, path, image])
 }
