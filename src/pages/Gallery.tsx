@@ -5,23 +5,15 @@ import catalog from '../animations/registry'
 import AnimationCard from '../components/AnimationCard'
 import FilterBar from '../components/FilterBar'
 import SampleTextHero from '../components/SampleTextHero'
-import ThemeControl from '../components/ThemeControl'
 import { useSampleText } from '../lib/useSampleText'
 import { SITE_DESCRIPTION, SITE_TITLE, useDocumentMeta } from '../lib/useDocumentMeta'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
 import type { Category } from '../lib/types'
-import type { ThemeMode } from '../lib/useTheme'
 
 const CATEGORY_ORDER: Category[] = ['entrance', 'kinetic', 'scroll', 'hover', 'loop', 'exit']
 const GSAP_VERSION = (pkg.dependencies.gsap as string).replace(/^[^0-9]*/, '')
 
-export default function Gallery({
-  theme,
-  onThemeToggle,
-}: {
-  theme: ThemeMode
-  onThemeToggle: (m: ThemeMode) => void
-}) {
+export default function Gallery() {
   const [sampleText, setSampleText] = useSampleText()
   const [engine, setEngine] = usePreviewEngine()
   const [inputValue, setInputValue] = useState(sampleText)
@@ -99,9 +91,6 @@ export default function Gallery({
               on older browsers. We tell you which is which.
             </p>
           </div>
-          <div className="page-header-controls">
-            <ThemeControl mode={theme} onChange={onThemeToggle} />
-          </div>
         </div>
         <div className="page-header-badges">
           <button type="button" onClick={copyInstall} className="badge-btn">
@@ -166,15 +155,6 @@ export default function Gallery({
         )}
       </main>
 
-      <footer className="page-footer">
-        <span>MIT licence</span>
-        <a href="https://github.com/aowshad/kinetic" target="_blank" rel="noreferrer">
-          Contribute
-        </a>
-        <a href="https://gsap.com" target="_blank" rel="noreferrer">
-          Built with GSAP
-        </a>
-      </footer>
     </div>
   )
 }
