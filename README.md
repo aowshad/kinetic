@@ -77,6 +77,12 @@ rather than naive string spreading, so combining marks and family emoji survive.
 Vite + React + TypeScript, Tailwind v4, GSAP 3.15 (SplitText, ScrambleTextPlugin,
 ScrollTrigger, TextPlugin, CustomEase — all free as of GSAP 3.13).
 
+## Contributing
+
+Adding an animation is one folder — see [CONTRIBUTING.md](CONTRIBUTING.md) for
+the folder shape, the `AnimationModule` contract, the honesty rules behind the
+`vanilla` tier, and how to record its gif.
+
 ## Deploy
 
 Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
@@ -84,3 +90,7 @@ which builds and publishes `dist/` to GitHub Pages. In the repo settings, set
 **Settings → Pages → Source → GitHub Actions**. The site is served from
 `/kinetic/` (see `base` in `vite.config.ts`) — if the repo is renamed, update
 that value to match.
+
+## License
+
+[MIT](LICENSE) © 2026 Al Aowshad Himel
