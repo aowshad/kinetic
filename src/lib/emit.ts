@@ -97,12 +97,40 @@ function withCss(code: string, css?: string): string {
   return css ? `${code}\n/* CSS */\n${css.trim()}\n` : code
 }
 
+const CDN = 'https://cdn.jsdelivr.net/npm/gsap@3'
+
+/**
+ * Bare `import gsap from 'gsap'` is a syntax error in a plain <script> and
+ * resolves nowhere in a module one, so the GSAP snippet could not be pasted
+ * into a blank file at all — only into a project that already had a bundler.
+ * The import map fixes that without touching the imports themselves, which
+ * matters because those lines are what a reader actually ships: moving this
+ * into a project with GSAP installed means deleting this block and nothing
+ * else.
+ *
+ * Plugins need an entry each. The package exposes them as
+ * `gsap/ScrollTrigger`, the file on the CDN is `ScrollTrigger.js`, and a
+ * trailing-slash prefix mapping would resolve to a path that doesn't exist.
+ */
+function importMap(plugins: string[]): string {
+  const imports: Record<string, string> = { gsap: `${CDN}/+esm` }
+  for (const p of plugins) imports[`gsap/${p}`] = `${CDN}/${p}.js/+esm`
+  // No angle brackets in the comment text: this block sits next to code that
+  // ends up inside a module script, and an HTML comment is a parse error there.
+  return `<!-- Load GSAP, then put the JS below in a module script. Delete this block if GSAP is already installed. -->
+<script type="importmap">
+${JSON.stringify({ imports }, null, 2)}
+</script>`
+}
+
 export function emitVanilla(module: AnimationModule, source: string, o: AnimationOptions, css?: string) {
   const group = reducedMotionGroup(module)
   const body = indent(transformBody(extractBody(source), o, group !== 'skip'), 2)
   const fnName = toCamel(module.id)
   const reducedMotionCode = group === 'skip' ? skipGuard('  ', ' () => {}') : reducedMotionPreamble(group, o, body, '  ')
-  const code = `${importLines(module.plugins).join('\n')}\n${registerLine(module.plugins)}
+  const code = `${importMap(module.plugins)}
+
+${importLines(module.plugins).join('\n')}\n${registerLine(module.plugins)}
 export function ${fnName}(el) {
 ${reducedMotionCode}${body}
 }
