@@ -67,7 +67,7 @@ export default function AnimationCard({
   const js = openedOnce && vanillaSource ? emitVanillaJS(module, vanillaSource, module.defaults, css) : null
 
   const copyLink = async () => {
-    const url = `${location.origin}${location.pathname}#/a/${module.id}`
+    const url = `${location.origin}${import.meta.env.BASE_URL}a/${module.id}`
     await navigator.clipboard.writeText(url)
     setLinkCopied(true)
     setTimeout(() => setLinkCopied(false), 2000)

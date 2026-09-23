@@ -7,6 +7,7 @@ import ScrollStage from '../components/ScrollStage'
 import ControlPanel, { DEFAULT_ALIGN, type Align } from '../components/ControlPanel'
 import CodeTabs from '../components/CodeTabs'
 import { useAnimation } from '../lib/useAnimation'
+import { SITE_NAME, useDocumentMeta } from '../lib/useDocumentMeta'
 import { DEFAULT_SAMPLE_TEXT, useSampleText } from '../lib/useSampleText'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
 import { usePrefersReducedMotion } from '../lib/usePrefersReducedMotion'
@@ -69,6 +70,12 @@ function DetailView({
   const prefersReducedMotion = usePrefersReducedMotion()
   const loopBlocked = prefersReducedMotion && module.reducedMotion === 'skip'
 
+  useDocumentMeta({
+    title: `${module.name} — ${SITE_NAME} text animation`,
+    description: `${module.blurb} A copy-paste ${module.category} text animation in zero-dependency JS, GSAP, or React.`,
+    path: `a/${module.id}/`,
+  })
+
   const handleTrackScroll = (el: HTMLDivElement) => {
     const max = el.scrollHeight - el.clientHeight
     setScrollProgress(max > 0 ? (el.scrollTop / max) * 100 : 0)
@@ -105,7 +112,7 @@ function DetailView({
   const js = vanillaSource ? emitVanillaJS(module, vanillaSource, options, css) : null
 
   const copyLink = async () => {
-    await navigator.clipboard.writeText(`${location.origin}${location.pathname}#/a/${module.id}`)
+    await navigator.clipboard.writeText(`${location.origin}${import.meta.env.BASE_URL}a/${module.id}`)
     setLinkCopied(true)
     setTimeout(() => setLinkCopied(false), 2000)
   }

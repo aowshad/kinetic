@@ -23,6 +23,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # The build's pre-render pass renders each route in a real browser, so
+      # the binary has to be there — npm ci alone does not fetch it.
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -7,6 +7,7 @@ import FilterBar from '../components/FilterBar'
 import SampleTextHero from '../components/SampleTextHero'
 import ThemeControl from '../components/ThemeControl'
 import { useSampleText } from '../lib/useSampleText'
+import { SITE_DESCRIPTION, SITE_TITLE, useDocumentMeta } from '../lib/useDocumentMeta'
 import { usePreviewEngine } from '../lib/usePreviewEngine'
 import type { Category } from '../lib/types'
 import type { ThemeMode } from '../lib/useTheme'
@@ -27,6 +28,8 @@ export default function Gallery({
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([])
   const [installCopied, setInstallCopied] = useState(false)
+
+  useDocumentMeta({ title: SITE_TITLE, description: SITE_DESCRIPTION, path: '' })
 
   useEffect(() => {
     const id = setTimeout(() => setSampleText(inputValue), 300)
