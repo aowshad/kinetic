@@ -34,6 +34,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { createServer } from 'vite'
 import { readCatalog, sampleFor } from './lib/catalog.mjs'
+import { checkStylesheets } from './lib/stylesheets.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const animationsDir = join(root, 'src/animations')
@@ -175,6 +176,17 @@ async function main() {
   await server.listen()
   const base = server.resolvedUrls.local[0]
   const browser = await chromium.launch()
+
+  // 0. Every rule a snippet ships with has to be live on the site too. Here
+  //    that means the copies hand-kept in index.css, which can drift.
+  const sheets = await checkStylesheets(browser, base, animationsDir, catalog.map((e) => e.id))
+  const sheetFailures = sheets.filter((s) => s.missing.length)
+  console.log(
+    `\nStylesheets: ${sheets.length} style.css file(s), ${sheets.reduce((n, s) => n + s.rules, 0)} rule(s)` +
+      (sheetFailures.length ? '' : ' — all live on the page'),
+  )
+  sheetFailures.forEach((s) => console.log(`  FAIL  ${s.id.padEnd(22)} not on the page: ${s.missing.join(', ')}`))
+
   const results = []
   const controls = new Map()
 
@@ -261,7 +273,7 @@ async function main() {
     console.error(`\nCoverage gap: expected ${expected} results, got ${results.length}`)
     process.exit(1)
   }
-  if (failed.length) process.exit(1)
+  if (failed.length || sheetFailures.length) process.exit(1)
 }
 
 main().catch((err) => {
