@@ -96,9 +96,13 @@ so implementations carry three sentinels that [`src/lib/emit.ts`](src/lib/emit.t
 reads. Keep them or the copied snippet breaks:
 
 - `// #region body` / `// #endregion body` — wrap the part that gets emitted.
-  Everything outside is repo plumbing.
+  Everything outside is repo plumbing — including any helper constant or
+  function you declare at the top of the file, which the snippet will then
+  call without defining. Declare helpers inside the region.
 - `// @internal` — drop this line from the snippet (typically the
-  `onComplete?.()` call, which only the gallery needs).
+  `onComplete?.()` call, which only the gallery needs). It drops exactly one
+  line, so keep the whole statement on it: a chain split across lines keeps
+  every line but the last.
 - `// @emit: <replacement>` — emit this line as `<replacement>` instead, for
   stripping TypeScript from plain-JS output.
 

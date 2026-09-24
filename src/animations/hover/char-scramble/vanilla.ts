@@ -2,11 +2,10 @@ import { EASE_POINTS } from '../../../lib/linearEases'
 import { easeAt } from '../../../lib/easeAt'
 import type { AnimationImpl } from '../../../lib/types'
 
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-const randChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
-
 export const run: AnimationImpl = (el, o) => {
   // #region body
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const randChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
   const text = el.textContent ?? ''
   const chars = [...text]
   const points = EASE_POINTS[o.ease] ?? [0, 1]

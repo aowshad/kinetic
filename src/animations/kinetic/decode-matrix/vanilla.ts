@@ -3,11 +3,10 @@ import { EASE_POINTS } from '../../../lib/linearEases'
 import { easeAt } from '../../../lib/easeAt'
 import type { AnimationImpl } from '../../../lib/types'
 
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-const randChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
-
 export const run: AnimationImpl = (el, o, onComplete) => {
   // #region body
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const randChar = () => CHARS[Math.floor(Math.random() * CHARS.length)]
   el.classList.add('k-mono')
   const split = splitChars(el)
   const finals = split.chars.map((c) => c.textContent ?? '')

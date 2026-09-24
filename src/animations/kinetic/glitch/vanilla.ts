@@ -34,9 +34,7 @@ export const run: AnimationImpl = (el, o, onComplete) => {
     ],
     { duration: legMs, delay: delayMs, iterations: 6, direction: 'alternate', easing, fill: 'both' },
   )
-  Promise.all([anim0.finished, anim1.finished])
-    .then(() => onComplete?.())
-    .catch(() => {}) // @internal
+  Promise.all([anim0.finished, anim1.finished]).then(() => onComplete?.()).catch(() => {}) // @internal
   return () => {
     anim0.cancel()
     anim1.cancel()
